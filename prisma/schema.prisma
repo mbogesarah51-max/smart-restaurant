@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CLIENT
+  RESTAURANT_OWNER
+  ADMIN
+}
+
+enum PriceRange {
+  BUDGET
+  MODERATE
+  PREMIUM
+  LUXURY
+}
+
+enum MenuCategory {
+  FOOD
+  DRINK
+  DESSERT
+  OTHER
+}
+
+enum ReservationStatus {
+  PENDING
+  AWAITING_RESPONSE
+  ACCEPTED
+  REJECTED
+  PAYMENT_PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum CancelledBy {
+  CLIENT
+  RESTAURANT
+  SYSTEM
+}
+
+model User {
+  id           String   @id @default(cuid())
+  clerkId      String?  @unique
+  name         String
+  email        String   @unique
+  phone        String   @unique
+  passwordHash String
+  role         Role     @default(CLIENT)
+  profileImage String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  restaurants  Restaurant[]
+  reservations Reservation[]
+
+  @@map("users")
+}
+
+model Restaurant {
+  id            String     @id @default(cuid())
+  ownerId       String
+  owner         User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name          String
+  slug          String     @unique
+  description   String?
+  bannerImage   String?
+  galleryImages String[]
+  phone         String
+  whatsapp      String?
+  email         String?
+  address       String
+  city          String
+  latitude      Float?
+  longitude     Float?
+  priceRange    PriceRange @default(MODERATE)
+  amenities     String[]
+  isApproved    Boolean    @default(false)
+  isActive      Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  menuItems          MenuItem[]
+  reservations       Reservation[]
+  availabilitySlots  AvailabilitySlot[]
+
+  @@map("restaurants")
+}
+
+model MenuItem {
+  id           String       @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  name         String
+  description  String?
+  price        Float
+  category     MenuCategory @default(FOOD)
+  image        String?
+  isAvailable  Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@map("menu_items")
+}
+
+model Reservation {
+  id               String            @id @default(cuid())
+  userId           String
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurantId     String
+  restaurant       Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  date             DateTime
+  time             String
+  guestCount       Int
+  preferences      String?
+  status              ReservationStatus @default(PENDING)
+  responseDeadline    DateTime?
+  paymentDeadline     DateTime?
+  paymentReference    String?
+  paymentMethod       String?
+  paidAt              DateTime?
+  paymentId           String?
+  totalAmount         Float?
+  bookingFee          Float?
+  rejectionReason     String?
+  cancelledBy         CancelledBy?
+  cancellationReason  String?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@map("reservations")
+}
+
+model AvailabilitySlot {
+  id           String     @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  dayOfWeek    Int
+  openTime     String
+  closeTime    String
+  maxCapacity  Int?
+  isActive     Boolean    @default(true)
+
+  @@map("availability_slots")
+}
