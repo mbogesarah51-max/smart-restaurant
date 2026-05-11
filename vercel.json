@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/check-expired-reservations",
-      "schedule": "* * * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
