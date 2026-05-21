@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ChopWise — Project Overview</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Helvetica", "Arial", sans-serif;
+    color: #1f2937;
+    font-size: 11pt;
+    line-height: 1.55;
+    margin: 0;
+  }
+  h1, h2, h3, h4 { color: #0f172a; font-weight: 700; }
+  h1 { font-size: 28pt; margin: 0 0 6px; letter-spacing: -0.5px; }
+  h2 {
+    font-size: 17pt;
+    margin: 28px 0 10px;
+    border-bottom: 2px solid #ea580c;
+    padding-bottom: 6px;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 13pt;
+    margin: 18px 0 6px;
+    color: #c2410c;
+    page-break-after: avoid;
+  }
+  h4 {
+    font-size: 11.5pt;
+    margin: 14px 0 4px;
+    color: #1f2937;
+    page-break-after: avoid;
+  }
+  p { margin: 6px 0 10px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px; padding-left: 22px; }
+  li { margin: 3px 0; }
+  strong { color: #0f172a; }
+  em { color: #4b5563; }
+
+  .cover {
+    height: 257mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .cover .badge {
+    display: inline-block;
+    background: #fff7ed;
+    color: #c2410c;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 10pt;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 0 auto 18px;
+  }
+  .cover h1 {
+    font-size: 42pt;
+    color: #ea580c;
+    margin: 0 0 10px;
+  }
+  .cover .tagline {
+    font-size: 15pt;
+    color: #374151;
+    margin: 0 0 36px;
+    font-weight: 300;
+  }
+  .cover .meta {
+    margin-top: 50px;
+    color: #6b7280;
+    font-size: 10pt;
+    line-height: 1.8;
+  }
+  .cover .meta strong { color: #1f2937; }
+
+  .toc {
+    background: #fafafa;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 18px 26px;
+    page-break-after: always;
+  }
+  .toc h2 { border: 0; margin-top: 0; }
+  .toc ol { padding-left: 22px; }
+  .toc li { margin: 5px 0; font-size: 11pt; }
+
+  .callout {
+    background: #fff7ed;
+    border-left: 4px solid #ea580c;
+    padding: 12px 16px;
+    margin: 12px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .callout.blue { background: #eff6ff; border-left-color: #2563eb; }
+  .callout.green { background: #f0fdf4; border-left-color: #16a34a; }
+  .callout.gray { background: #f9fafb; border-left-color: #6b7280; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 14px;
+    font-size: 10pt;
+  }
+  th, td {
+    border: 1px solid #e5e7eb;
+    padding: 7px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: #fff7ed; color: #c2410c; font-weight: 600; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 10px 0;
+  }
+  .feature {
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: #fff;
+  }
+  .feature .title {
+    font-weight: 700;
+    color: #c2410c;
+    margin-bottom: 4px;
+    font-size: 10.5pt;
+  }
+  .feature .desc { font-size: 10pt; color: #4b5563; }
+
+  .lifecycle {
+    background: #0f172a;
+    color: #f1f5f9;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-family: "Courier New", monospace;
+    font-size: 9.5pt;
+    line-height: 1.6;
+    white-space: pre;
+    margin: 12px 0;
+    overflow: hidden;
+  }
+
+  .actor-card {
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #ea580c;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    background: #fff;
+  }
+  .actor-card h4 { margin-top: 0; color: #ea580c; }
+
+  .page-break { page-break-before: always; }
+  .no-break { page-break-inside: avoid; }
+
+  footer {
+    margin-top: 40px;
+    padding-top: 14px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    color: #6b7280;
+    font-size: 9.5pt;
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="cover">
+  <div>
+    <div class="badge">Project Overview Document</div>
+    <h1>ChopWise</h1>
+    <p class="tagline">Smart Restaurant Reservation &amp; AI Recommendation Platform<br>for Douala, Cameroon</p>
+    <div class="meta">
+      <strong>Document Purpose:</strong> Complete system overview for non-technical readers<br>
+      <strong>City of focus:</strong> Douala, Cameroon &nbsp;&middot;&nbsp; <strong>Currency:</strong> FCFA (XAF)<br>
+      <strong>Date:</strong> May 2026 &nbsp;&middot;&nbsp; <strong>Version:</strong> 1.0
+    </div>
+  </div>
+</section>
+
+<!-- TOC -->
+<section class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li>The Problem We Are Solving in Douala</li>
+    <li>What ChopWise Is</li>
+    <li>Who Uses the Platform</li>
+    <li>The Complete Set of System Functions</li>
+    <li>How a Reservation Works, From Start to Finish</li>
+    <li>The Payment System</li>
+    <li>The Admin Side: Trust &amp; Safety</li>
+    <li>Technology Behind the Platform</li>
+    <li>What Is Live Today vs. What Is Planned</li>
+    <li>Why ChopWise Matters for Douala</li>
+  </ol>
+</section>
+
+<!-- 1. PROBLEM -->
+<h2>1. The Problem We Are Solving in Douala</h2>
+
+<p>
+Douala is the largest city and the economic capital of Cameroon. It hosts thousands of
+restaurants — from neighbourhood <em>tournedos</em> spots in Akwa and Bonanjo, to family
+restaurants in Bonapriso, fish grills in Deïdo, and upscale dining in Bonamoussadi. Yet,
+when a resident or a visitor wants to find a place to eat, plan a celebration, or simply
+book a table for the evening, the entire experience is still informal, fragmented, and
+frustrating.
+</p>
+
+<h3>1.1 The Specific Pain Points in the City</h3>
+
+<div class="feature-grid">
+  <div class="feature">
+    <div class="title">No central place to discover restaurants</div>
+    <div class="desc">
+      Diners rely on word of mouth, Facebook pages, or WhatsApp status. There is no single
+      reliable directory that shows menus, prices, opening hours, and locations together.
+    </div>
+  </div>
+  <div class="feature">
+    <div class="title">Reservations happen by phone — or not at all</div>
+    <div class="desc">
+      To "book" a table, customers call the restaurant. Many calls go unanswered, lines are
+      busy, or the staff forgets to write the booking down. Walk-ins are turned away on
+      busy nights.
+    </div>
+  </div>
+  <div class="feature">
+    <div class="title">Hidden prices, surprise bills</div>
+    <div class="desc">
+      Without a public menu, diners do not know what a meal will cost until they sit down.
+      This blocks people on a budget from confidently trying new places.
+    </div>
+  </div>
+  <div class="feature">
+    <div class="title">Restaurants lose customers they never knew they had</div>
+    <div class="desc">
+      Owners cannot reach diners online, cannot show their dishes, and have no way to
+      track how many bookings they receive each week.
+    </div>
+  </div>
+  <div class="feature">
+    <div class="title">No-shows hurt small restaurants</div>
+    <div class="desc">
+      Without a commitment from the diner, restaurants prepare tables and food for guests
+      who never arrive — a direct loss for businesses with thin margins.
+    </div>
+  </div>
+  <div class="feature">
+    <div class="title">No digital presence for most local restaurants</div>
+    <div class="desc">
+      Many great Cameroonian restaurants have no website at all. They are invisible to
+      tourists, expatriates, and young diners who search online first.
+    </div>
+  </div>
+  <div class="feature">
+    <div class="title">No AI to help diners decide based on budget</div>
+    <div class="desc">
+      Even global tools like Google Maps and Google My Business only let you search and
+      filter. They cannot answer a real human question like "I have 2,500 FCFA, what can
+      I eat tonight near me?" Diners are left to scroll and guess.
+    </div>
+  </div>
+</div>
+
+<div class="callout">
+  <strong>The core problem in one sentence:</strong> In Douala, diners and restaurants are
+  not properly connected. Discovery is informal, reservations are unreliable, prices are
+  hidden, and small restaurants have no digital tools to grow. ChopWise solves this gap.
+</div>
+
+<h3>1.2 The Missing Piece: An AI That Recommends by Budget</h3>
+<p>
+The biggest gap in the dining experience — not only in Douala, but globally — is that
+<strong>no major platform actually helps a diner decide what to eat based on what they
+can afford right now</strong>. Search tools like Google Maps, Google My Business, TripAdvisor,
+and even local Facebook groups all do the same thing: they show a list and leave the
+diner to scroll, compare, and guess. They expect the user to already know the answer.
+</p>
+
+<p>
+But this is not how people in Douala actually make dining decisions. A student walking
+home from class, a worker after a long day, or a couple on a Friday evening usually starts
+with a budget in mind first: <em>"I have 2,000 FCFA"</em>, <em>"We have 10,000 FCFA for
+two"</em>, <em>"I want something under 5,000 FCFA that delivers in Bonapriso."</em> No
+existing platform answers that question directly.
+</p>
+
+<p>
+ChopWise bridges this gap with a built-in <strong>AI Recommendation Engine</strong>. A
+diner can simply tell the AI their budget, their location, what kind of food they feel
+like, or even a special occasion, and the AI returns a short, sensible list of
+restaurants and even specific dishes that fit. The recommendations are grounded in real
+menu data from real restaurants on the platform — not generic search results — which
+means every suggestion is something the diner can actually order and book right away.
+</p>
+
+<div class="callout">
+  <strong>Why this is unique:</strong> Google Maps tells you <em>where</em> restaurants
+  are. Google My Business tells you <em>what hours</em> they keep. ChopWise tells you
+  <em>"given your 3,000 FCFA budget tonight, here are 4 restaurants near you, and here
+  is what to order at each one to stay in budget."</em> That is a level of personal
+  assistance no global mapping platform offers, and it is exactly what diners in
+  Cameroon need.
+</div>
+
+<h3>1.3 Why This Matters Now</h3>
+<p>
+Douala's middle class is growing, smartphone use is widespread, mobile money (MTN MoMo,
+Orange Money) is mainstream, and people increasingly expect the same digital convenience
+they see in services like Uber, Yango, or Jumia. AI assistants like ChatGPT have also
+taught users to <em>ask</em> for help rather than <em>search</em> for it. Yet the
+restaurant sector — and the broader local discovery sector — has been left behind.
+ChopWise brings both the convenience of online booking <strong>and</strong> the
+intelligence of a personal AI dining assistant to Cameroon.
+</p>
+
+<!-- 2. WHAT IT IS -->
+<h2 class="page-break">2. What ChopWise Is</h2>
+
+<p>
+ChopWise is a web platform — accessible from any phone or computer — that lets people in
+Douala (and across Cameroon) <strong>discover restaurants, view real menus with real
+prices in FCFA, reserve a table online, and confirm the booking with a small fee paid by
+mobile money</strong>. Restaurants get a digital profile, a way to manage their menu and
+bookings, and a steady stream of confirmed customers.
+</p>
+
+<div class="callout green">
+  <strong>In short:</strong> ChopWise is to restaurants in Cameroon what online booking
+  platforms are to travel — a trusted middleman that gives diners confidence, gives
+  restaurants visibility, and protects both sides through a clear booking and payment flow.
+</div>
+
+<h3>2.1 The Three Promises of the Platform</h3>
+<ul>
+  <li><strong>For diners:</strong> See the menu and the price before you go. Ask an AI for a restaurant that fits your budget. Reserve a table from your phone. Know your reservation is confirmed.</li>
+  <li><strong>For restaurants:</strong> Be found online and recommended by AI to the right diners. Receive serious bookings only. Reduce no-shows. Manage your menu without paperwork.</li>
+  <li><strong>For the city:</strong> A modern, AI-assisted dining ecosystem that supports local restaurants, gives tourists a reliable way to eat well, and brings the sector into the digital economy.</li>
+</ul>
+
+<!-- 3. WHO USES IT -->
+<h2>3. Who Uses the Platform</h2>
+
+<p>The system is built around three clear roles. Each one has its own dashboard and its own set of tools.</p>
+
+<div class="actor-card">
+  <h4>The Diner (Client)</h4>
+  <p>
+    A person who wants to eat out. They register with a name, email, phone, and password.
+    They can browse restaurants without even logging in, but to book a table they need an
+    account. They use ChopWise to find a place, view photos and the menu, make a
+    reservation, and pay the booking fee to lock it in.
+  </p>
+</div>
+
+<div class="actor-card">
+  <h4>The Restaurant Owner</h4>
+  <p>
+    The person who manages the restaurant. They sign up, complete a 7-step wizard to set up
+    their restaurant profile (name, location on a map, opening hours, menu, photos, etc.),
+    and wait for an administrator to approve it. Once approved, they receive reservation
+    requests and decide to accept or reject each one within 15 minutes.
+  </p>
+</div>
+
+<div class="actor-card">
+  <h4>The Administrator</h4>
+  <p>
+    The team running ChopWise. Admins review and approve new restaurants before they appear
+    publicly, manage users, suspend or activate accounts, and monitor activity on the
+    platform. The admin role keeps the platform trustworthy by keeping bad actors out.
+  </p>
+</div>
+
+<!-- 4. FUNCTIONS -->
+<h2 class="page-break">4. The Complete Set of System Functions</h2>
+
+<p>
+This section lists every function the platform offers today. Each function is grouped by
+the area of the system it belongs to. If you are evaluating ChopWise, this is the full
+inventory of what has been built.
+</p>
+
+<h3>4.1 Accounts &amp; Authentication</h3>
+<ul>
+  <li><strong>User registration</strong> with name, email, phone, password, and role (Diner or Restaurant Owner). Passwords are encrypted; duplicate emails or phones are rejected with clear errors.</li>
+  <li><strong>Automatic sign-in after registration</strong> — the user does not need to log in again right after creating an account.</li>
+  <li><strong>Email + password login</strong> with friendly error messages ("No account found", "Incorrect password").</li>
+  <li><strong>Profile management</strong> — update name, phone, and profile picture.</li>
+  <li><strong>Password change</strong> with current password verification and strong-password rules.</li>
+  <li><strong>Secure sign-out</strong> available from any dashboard page.</li>
+  <li><strong>Role-based dashboards</strong> — diners, restaurant owners, and admins each see a different home page with different tools.</li>
+</ul>
+
+<h3>4.2 Restaurant Onboarding &amp; Profile</h3>
+<ul>
+  <li><strong>7-step setup wizard</strong> for restaurant owners: Basic Info, Location, Images, Description, Amenities, Schedule, Review.</li>
+  <li><strong>Drag-to-pin location</strong> on an interactive map (using OpenStreetMap), with the ability to enter coordinates manually.</li>
+  <li><strong>Image uploads</strong> — a banner image and up to 6 gallery images, hosted on Cloudinary's global CDN for fast loading.</li>
+  <li><strong>AI-generated description</strong> — owners can click a button and have OpenAI generate a polished 2-3 sentence description of their restaurant.</li>
+  <li><strong>Amenities selector</strong> — multi-select from 12 predefined options (parking, WiFi, terrace, family-friendly, etc.).</li>
+  <li><strong>Weekly schedule</strong> — set opening and closing times for each day of the week, with the option to mark days as closed.</li>
+  <li><strong>Draft auto-save</strong> — if the owner closes the browser mid-setup, the progress is restored on return.</li>
+  <li><strong>Tabbed profile editor</strong> — after creation, owners can edit any section of their profile at any time.</li>
+  <li><strong>Automatic URL slug</strong> — each restaurant gets a clean web address (e.g., <em>chopwise.app/restaurants/chez-maurice</em>).</li>
+</ul>
+
+<h3>4.3 Menu Management</h3>
+<ul>
+  <li><strong>Add, edit, and delete menu items</strong> with name, description, price in FCFA, category, and an optional photo.</li>
+  <li><strong>Four categories</strong> — Food, Drink, Dessert, Other — each with an item count.</li>
+  <li><strong>Mark items as available or unavailable</strong> with one click, useful when an ingredient runs out.</li>
+  <li><strong>Bulk actions</strong> — mark all items available or unavailable at once.</li>
+  <li><strong>AI-generated item descriptions</strong> — generate a short, appetising description for any dish.</li>
+  <li><strong>Preview mode</strong> — see the menu exactly as a customer will see it.</li>
+</ul>
+
+<h3>4.4 Discovery &amp; Search (for Diners)</h3>
+<ul>
+  <li><strong>Public restaurant browsing</strong> — anyone can browse restaurants without creating an account.</li>
+  <li><strong>Text search</strong> — search by restaurant name or description.</li>
+  <li><strong>Filters</strong> — by price range (Budget, Moderate, Premium, Luxury), city, and amenities (e.g., only show restaurants with parking and WiFi).</li>
+  <li><strong>Sorting</strong> — newest first, price low-to-high, or price high-to-low.</li>
+  <li><strong>Pagination</strong> — 12 restaurants per page, with shareable URLs (you can send a search result link to a friend).</li>
+  <li><strong>Two views</strong> — a grid of cards, or an interactive map of Cameroon showing every restaurant as a pin.</li>
+  <li><strong>Restaurant detail page</strong> — banner, image gallery with full-screen view, description, amenities, full menu, weekly hours (today highlighted), location map, contact info, and a "Reserve a Table" button.</li>
+  <li><strong>Mobile sticky booking bar</strong> — on phones, a "Reserve" button is always visible at the bottom of the screen.</li>
+</ul>
+
+<h3>4.5 Reservation System</h3>
+<ul>
+  <li><strong>4-step booking wizard</strong> (Date &amp; Time → Guest Details → Optional Pre-order → Review &amp; Confirm).</li>
+  <li><strong>Smart date and time picker</strong> — only allows future dates (max 30 days ahead), 30-minute intervals, blocks closed days, requires at least 1 hour notice for same-day bookings.</li>
+  <li><strong>Guest count</strong> from 1 to 20 with a +/- counter.</li>
+  <li><strong>Special occasion</strong> — Birthday, Anniversary, Business Meeting, Date Night, etc.</li>
+  <li><strong>Free-text special requests</strong> — allergies, seating preferences, etc.</li>
+  <li><strong>Optional pre-order</strong> — diners can pre-select dishes from the menu so the kitchen is ready when they arrive.</li>
+  <li><strong>Booking fee notice</strong> — the diner is clearly told about the 500 FCFA booking fee before submitting.</li>
+  <li><strong>Live countdown timers</strong> — the diner sees how long the restaurant has to respond; the restaurant sees how long the diner has to pay.</li>
+  <li><strong>Color-coded urgency</strong> — the timer turns red under 2 minutes and pulses under 1 minute.</li>
+  <li><strong>Automatic cancellation</strong> — if the restaurant does not respond within 15 minutes, or the diner does not pay within 30 minutes, the system cancels the reservation cleanly.</li>
+</ul>
+
+<h3>4.6 Restaurant-Side Reservation Management</h3>
+<ul>
+  <li><strong>Live inbox of incoming requests</strong> — refreshes every 15 seconds when the tab is active.</li>
+  <li><strong>Accept a reservation</strong> — moves it to "awaiting payment" and starts the 30-minute payment window for the diner.</li>
+  <li><strong>Reject with a reason</strong> — Fully booked, Time slot unavailable, Kitchen closed, or a custom reason.</li>
+  <li><strong>Cancel a confirmed reservation</strong> — with a required reason (e.g., emergency closure).</li>
+  <li><strong>Contact the diner</strong> — direct WhatsApp or phone-call link from inside the reservation card.</li>
+  <li><strong>Reservation history and statistics</strong> — see past bookings, cancellations, and counts.</li>
+</ul>
+
+<h3>4.7 Payment System</h3>
+<ul>
+  <li><strong>Pay Now flow</strong> — diners pay the 500 FCFA booking fee to lock in the table.</li>
+  <li><strong>Payment method selection</strong> — MTN MoMo, Orange Money, or bank card.</li>
+  <li><strong>Phone-number entry</strong> for mobile money.</li>
+  <li><strong>Payment countdown</strong> — the same payment deadline is shown on the checkout page.</li>
+  <li><strong>Receipt page</strong> — green success animation, full booking summary, downloadable/printable receipt with amount, reference number, method, date, and status.</li>
+  <li><strong>Simulated payments today</strong> — payments do not actually charge money yet; a clear yellow banner tells the user it is in test mode.</li>
+  <li><strong>Swap-ready architecture</strong> — switching to a real provider (NotchPay, CinetPay, MTN MoMo API) only requires changing 2 files. The full booking flow does not need to be rebuilt.</li>
+</ul>
+
+<h3>4.8 Admin Tools</h3>
+<ul>
+  <li><strong>Admin dashboard</strong> with live counts: total users (split by role), total restaurants (approved vs. pending), total reservations, pending approvals.</li>
+  <li><strong>Recent activity feed</strong> — last 10 registered users, last 5 pending restaurants.</li>
+  <li><strong>Restaurant moderation</strong> — tabs for Pending, Approved, Suspended, and All. Search and paginate 20 per page.</li>
+  <li><strong>Restaurant review page</strong> — see the full profile (images, menu, hours, owner contact) before approving.</li>
+  <li><strong>Approve / Reject / Suspend / Activate</strong> a restaurant with one click.</li>
+  <li><strong>User management</strong> — filter by role, search by name or email, suspend or reactivate a user.</li>
+  <li><strong>Safety check</strong> — an admin cannot suspend their own account by mistake.</li>
+</ul>
+
+<h3>4.9 Automated Background Jobs</h3>
+<ul>
+  <li><strong>Reservation expiry checker</strong> — runs every minute. Automatically cancels reservations where the restaurant did not respond in time, or where the diner did not pay in time.</li>
+  <li><strong>System-attributed cancellations</strong> — these auto-cancellations are tagged as "SYSTEM" with a clear reason, so both sides understand what happened.</li>
+</ul>
+
+<h3>4.10 Cross-Cutting Features</h3>
+<ul>
+  <li><strong>Mobile-first design</strong> — every page works from a 320px-wide phone screen up to a desktop.</li>
+  <li><strong>Loading skeletons</strong> on every page so the app never looks frozen.</li>
+  <li><strong>Toast notifications</strong> for every action (success, error, info).</li>
+  <li><strong>Error recovery</strong> — a "Try Again" screen catches crashes so the user is never stranded.</li>
+  <li><strong>FCFA throughout</strong> — every price, fee, and total is shown in the local currency.</li>
+  <li><strong>Cameroonian cities supported</strong> — Douala, Yaoundé, Bafoussam, Bamenda, Garoua, Maroua, Limbe, Buea, Kribi, Ngaoundéré.</li>
+</ul>
+
+<!-- 5. LIFECYCLE -->
+<h2 class="page-break">5. How a Reservation Works, From Start to Finish</h2>
+
+<p>This is the single most important flow in the system. Here it is, step by step.</p>
+
+<div class="lifecycle">
+1. A diner browses restaurants in Douala and opens a restaurant page.
+2. The diner clicks "Reserve a Table" and fills the 4-step form.
+3. The system saves the reservation as AWAITING_RESPONSE.
+   → A 15-minute timer starts for the restaurant to reply.
+
+4. The restaurant owner sees the request (live, refreshes every 15s).
+   ├─ Owner ACCEPTS  → status becomes PAYMENT_PENDING.
+   │                   → A 30-minute timer starts for the diner to pay.
+   ├─ Owner REJECTS  → status becomes REJECTED with the reason. End.
+   └─ Owner DOES NOTHING for 15 min → SYSTEM cancels it. End.
+
+5. The diner pays the 500 FCFA booking fee on the checkout page.
+   ├─ Payment succeeds → status becomes CONFIRMED.
+   ├─ Payment fails / 30-min passes → SYSTEM cancels it. End.
+   └─ Diner manually cancels → CANCELLED. End.
+
+6. Both parties now see the confirmed reservation in their dashboard.
+7. Either side can still cancel with a reason if needed.
+</div>
+
+<div class="callout blue">
+  <strong>Why this flow matters:</strong> Every step is bounded in time. Restaurants
+  cannot leave diners waiting forever. Diners cannot block a table without committing.
+  The result is a clean, fair, and trustworthy booking experience.
+</div>
+
+<!-- 6. PAYMENT -->
+<h2>6. The Payment System</h2>
+
+<h3>6.1 What Happens When a Diner Pays</h3>
+<ol>
+  <li>The reservation enters the PAYMENT_PENDING state after the restaurant accepts.</li>
+  <li>The diner clicks "Pay Now". The system generates a unique payment reference.</li>
+  <li>The checkout page shows the order summary, available payment methods, and the live countdown timer.</li>
+  <li>The diner selects a method (MTN MoMo, Orange Money, or Card) and enters a phone number.</li>
+  <li>The system processes the payment, marks the reservation as CONFIRMED, and records the payment time and method.</li>
+  <li>The diner is redirected to a confirmation page with a receipt they can print or save.</li>
+</ol>
+
+<h3>6.2 Why It Is Simulated for Now</h3>
+<p>
+Real payment integration in Cameroon (NotchPay, CinetPay, or the MTN MoMo API directly)
+requires regulatory paperwork and merchant accounts. To allow the platform to launch and
+gather user feedback first, payments are <strong>simulated</strong> — the full flow works,
+but no real money moves. A yellow banner on the checkout page makes this clear. The
+system is built so that switching to real payments later requires changing only two
+files — the rest of the booking pipeline remains untouched.
+</p>
+
+<!-- 7. ADMIN -->
+<h2>7. The Admin Side: Trust &amp; Safety</h2>
+
+<p>
+A platform that connects strangers (diners and restaurants) only works if both sides
+trust it. The admin tools exist exactly for that.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Admin Action</th><th>Why It Exists</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Restaurant approval before going public</td><td>Stops fake or low-quality listings from appearing to diners.</td></tr>
+    <tr><td>Suspend a restaurant</td><td>If a restaurant repeatedly rejects bookings without reason or behaves badly.</td></tr>
+    <tr><td>Suspend a user</td><td>If a diner abuses the system (e.g., books many tables and never pays).</td></tr>
+    <tr><td>Live statistics</td><td>Helps the operations team monitor platform health day by day.</td></tr>
+    <tr><td>Self-suspension safeguard</td><td>An admin cannot suspend their own account, preventing accidents.</td></tr>
+  </tbody>
+</table>
+
+<!-- 8. TECH -->
+<h2 class="page-break">8. Technology Behind the Platform</h2>
+
+<p>
+ChopWise is built on a modern, proven, and affordable technology stack. Everything is
+serverless, which means hosting costs scale with usage — perfect for a startup.
+</p>
+
+<table>
+  <thead><tr><th>Layer</th><th>Technology</th><th>Why It Was Chosen</th></tr></thead>
+  <tbody>
+    <tr><td>Web framework</td><td>Next.js 16 + React 19</td><td>Industry standard, fast page loads, great mobile performance.</td></tr>
+    <tr><td>Language</td><td>TypeScript</td><td>Catches bugs before users see them.</td></tr>
+    <tr><td>Styling</td><td>Tailwind CSS + shadcn/ui</td><td>Modern, consistent, mobile-first design.</td></tr>
+    <tr><td>Database</td><td>PostgreSQL on Neon</td><td>Reliable, serverless, scales automatically.</td></tr>
+    <tr><td>Authentication</td><td>Clerk</td><td>Secure session management out of the box.</td></tr>
+    <tr><td>Images</td><td>Cloudinary</td><td>Global CDN — fast image loading even on slow networks.</td></tr>
+    <tr><td>Maps</td><td>Leaflet + OpenStreetMap</td><td>Free, accurate, no Google Maps fees.</td></tr>
+    <tr><td>AI</td><td>OpenAI GPT-4o-mini</td><td>Generates restaurant and menu descriptions.</td></tr>
+    <tr><td>Hosting</td><td>Vercel</td><td>Auto-scaling, fast global delivery, simple deployments.</td></tr>
+  </tbody>
+</table>
+
+<!-- 9. STATUS -->
+<h2>9. What Is Live Today vs. What Is Planned</h2>
+
+<table>
+  <thead><tr><th>Feature</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>User registration &amp; login (Diner, Owner, Admin)</td><td>Live</td></tr>
+    <tr><td>Restaurant onboarding wizard (7 steps)</td><td>Live</td></tr>
+    <tr><td>Menu management with AI descriptions</td><td>Live</td></tr>
+    <tr><td>Public restaurant browsing without login</td><td>Live</td></tr>
+    <tr><td>Search, filters, grid and map views</td><td>Live</td></tr>
+    <tr><td>4-step reservation booking flow</td><td>Live</td></tr>
+    <tr><td>Live countdown timers (response &amp; payment)</td><td>Live</td></tr>
+    <tr><td>Restaurant accept / reject / cancel actions</td><td>Live</td></tr>
+    <tr><td>Simulated payment system (test mode)</td><td>Live</td></tr>
+    <tr><td>Admin restaurant approval &amp; user management</td><td>Live</td></tr>
+    <tr><td>Automated reservation expiry (every minute)</td><td>Live</td></tr>
+    <tr><td>Image upload to Cloudinary CDN</td><td>Live</td></tr>
+    <tr><td>AI restaurant descriptions (OpenAI)</td><td>Live</td></tr>
+    <tr><td>Real mobile money integration (NotchPay / CinetPay)</td><td>Planned</td></tr>
+    <tr><td>WhatsApp booking notifications</td><td>Planned</td></tr>
+    <tr><td>AI budget-based recommendations ("I have 2,000 FCFA…")</td><td>Planned</td></tr>
+    <tr><td>Reviews &amp; star ratings</td><td>Planned</td></tr>
+    <tr><td>Favorites &amp; wishlist</td><td>Planned</td></tr>
+    <tr><td>Owner analytics dashboard (revenue, trends)</td><td>Planned</td></tr>
+  </tbody>
+</table>
+
+<!-- 10. WHY -->
+<h2>10. Why ChopWise Matters for Douala</h2>
+
+<h3>10.1 For the Diner</h3>
+<p>
+A young professional in Akwa, an expatriate in Bonapriso, or a family in Bonamoussadi can
+now plan a Saturday evening on their phone in two minutes. They see what is open, what the
+menu costs, where it is on the map, and whether the table is theirs — before leaving the
+house. And when they don't know where to go, they simply tell the ChopWise AI their
+budget — <em>"3,000 FCFA, near Akwa, something local"</em> — and get a curated shortlist
+back. No more calling five places, no more arriving to find the restaurant fully booked,
+no more scrolling through Google Maps trying to guess what fits the wallet.
+</p>
+
+<h3>10.2 For the Restaurant Owner</h3>
+<p>
+A small restaurant in Deïdo that used to depend on walk-ins now has a free online storefront
+with photos, menu, and a real booking system. Reservations come in confirmed and paid. The
+owner spends less time on the phone and more time running the kitchen. Over time, the
+booking data tells them which dishes sell, which days are slow, and how to grow.
+</p>
+
+<h3>10.3 For the City of Douala</h3>
+<p>
+ChopWise digitises an entire sector that was operating on phone calls and word of mouth. It
+gives tourists a reliable way to find Cameroonian cuisine. It helps small restaurants compete
+with bigger ones. It moves transactions into the formal, mobile-money-backed economy. And it
+creates a foundation that future features — reviews, recommendations, analytics — can build
+on.
+</p>
+
+<div class="callout green">
+  <strong>The bigger picture:</strong> ChopWise is not just a booking app. It is the first
+  serious attempt to bring Cameroonian restaurants into the digital economy on terms that fit
+  Cameroon — FCFA pricing, mobile money payments, Leaflet maps that work on slow networks,
+  AI that helps small business owners write good descriptions, and a fair booking system that
+  protects both sides.
+</div>
+
+<footer>
+  ChopWise &mdash; Smart Restaurant Reservation &amp; AI Recommendation Platform &mdash;
+  Built for Douala, Cameroon &mdash; &copy; 2026
+</footer>
+
+</body>
+</html>
