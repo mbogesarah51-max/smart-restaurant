@@ -120,6 +120,7 @@ model Reservation {
   preferences      String?
   status              ReservationStatus @default(PENDING)
   responseDeadline    DateTime?
+  reminderSentAt      DateTime?
   paymentDeadline     DateTime?
   paymentReference    String?
   paymentMethod       String?

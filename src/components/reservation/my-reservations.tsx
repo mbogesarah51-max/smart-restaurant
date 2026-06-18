@@ -23,6 +23,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { BOOKING_FEE } from "@/lib/config";
 import { CountdownTimer } from "@/components/shared/countdown-timer";
 import { getClientReservations, cancelReservation } from "@/app/actions/reservation";
 import type { Reservation, Restaurant } from "@/generated/prisma/client";
@@ -220,7 +221,7 @@ function ReservationCard({ reservation: r, onCancel, onExpire }: {
                 href={`/dashboard/reservations/${r.id}/pay`}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
               >
-                Pay Now — {formatPrice(r.bookingFee || 500)}
+                Pay Now — {formatPrice(r.bookingFee || BOOKING_FEE)}
               </Link>
               {r.paymentDeadline && (
                 <CountdownTimer deadline={r.paymentDeadline} onExpire={onExpire} />
@@ -309,7 +310,7 @@ function ReservationCard({ reservation: r, onCancel, onExpire }: {
             {r.status === "PAYMENT_PENDING" && (
               <div className="pt-2">
                 <button className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold bg-brand-orange hover:bg-brand-orange-hover text-white transition-colors">
-                  Complete Payment — {formatPrice(r.bookingFee || 500)}
+                  Complete Payment — {formatPrice(r.bookingFee || BOOKING_FEE)}
                 </button>
               </div>
             )}

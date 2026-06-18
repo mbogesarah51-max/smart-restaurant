@@ -3,7 +3,7 @@
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { reservationSchema } from "@/lib/validations";
-import { RESPONSE_DEADLINE_MINUTES, BOOKING_FEE, PAYMENT_TIMEOUT_MINUTES } from "@/lib/config";
+import { RESPONSE_REMINDER_MINUTES, BOOKING_FEE, PAYMENT_TIMEOUT_MINUTES } from "@/lib/config";
 import { canTransitionTo } from "@/lib/reservation-status";
 import {
   sendWhatsAppMessage,
@@ -85,7 +85,9 @@ export async function createReservation(
     prefsData.estimatedTotal = preOrderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   }
 
-  const responseDeadline = new Date(Date.now() + RESPONSE_DEADLINE_MINUTES * 60 * 1000);
+  // Soft target: when this passes with no answer, the cron sends the owner a
+  // reminder. It does NOT auto-cancel the request (see check-expired-reservations).
+  const responseDeadline = new Date(Date.now() + RESPONSE_REMINDER_MINUTES * 60 * 1000);
 
   try {
     const reservation = await prisma.reservation.create({
@@ -340,14 +342,8 @@ export async function acceptReservation(reservationId: string): Promise<ActionRe
     return { success: false, message: `Cannot accept a reservation with status "${reservation.status}"` };
   }
 
-  // Check deadline hasn't passed
-  if (reservation.responseDeadline && new Date() > reservation.responseDeadline) {
-    await prisma.reservation.update({
-      where: { id: reservationId },
-      data: { status: "CANCELLED", cancelledBy: "SYSTEM", cancellationReason: "Response deadline expired" },
-    });
-    return { success: false, message: "Response deadline has passed. Reservation was auto-cancelled." };
-  }
+  // No response deadline enforcement — a pending request never auto-cancels.
+  // The owner may accept at any time, even after the reminder has gone out.
 
   try {
     const paymentDeadline = new Date(Date.now() + PAYMENT_TIMEOUT_MINUTES * 60 * 1000);

@@ -213,7 +213,7 @@ export function ExploreRestaurants({ initialData, initialParams, basePath = "/da
       <div className="flex gap-2 pt-2">
         <button
           onClick={() => { applyFilters(); setFilterOpen(false); }}
-          className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold bg-brand-orange hover:bg-brand-orange-hover text-white transition-colors"
+          className="sheen flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-brand-orange to-amber-500 hover:from-brand-orange-hover hover:to-amber-600 text-white shadow-[0_4px_14px_-2px_rgba(249,115,22,0.4)] transition-all duration-300"
         >
           Apply Filters
         </button>
@@ -231,8 +231,10 @@ export function ExploreRestaurants({ initialData, initialParams, basePath = "/da
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold font-heading text-foreground">Explore Restaurants</h1>
-        <p className="text-muted-foreground mt-1">Discover the best dining spots near you</p>
+        <h1 className="text-3xl font-bold font-heading tracking-tight text-foreground">
+          Explore <span className="text-gradient-ember">Restaurants</span>
+        </h1>
+        <p className="text-muted-foreground mt-1.5">Discover the best dining spots near you</p>
       </div>
 
       {/* Search + controls */}
@@ -276,7 +278,7 @@ export function ExploreRestaurants({ initialData, initialParams, basePath = "/da
         </div>
 
         {/* View toggle */}
-        <div className="flex border border-border/60 rounded-lg overflow-hidden">
+        <div className="flex border border-border/60 rounded-xl overflow-hidden bg-white/60">
           <button
             onClick={() => setView("grid")}
             className={`p-2 transition-colors ${view === "grid" ? "bg-brand-orange text-white" : "text-muted-foreground hover:bg-muted/80"}`}
@@ -324,8 +326,11 @@ export function ExploreRestaurants({ initialData, initialParams, basePath = "/da
       <div className="flex gap-6">
         {/* Desktop filter sidebar */}
         <div className="hidden lg:block w-64 shrink-0">
-          <div className="sticky top-20 rounded-xl border border-border/50 bg-white p-4 shadow-sm">
-            <h3 className="text-sm font-semibold text-foreground mb-4">Filters</h3>
+          <div className="sticky top-24 rounded-2xl border border-black/[0.05] bg-white/80 backdrop-blur-sm p-5 shadow-[0_1px_3px_rgba(26,20,17,0.04),0_12px_32px_-16px_rgba(26,20,17,0.12)]">
+            <div className="flex items-center gap-2 mb-4">
+              <SlidersHorizontal className="size-4 text-brand-orange" />
+              <h3 className="text-sm font-semibold text-foreground">Filters</h3>
+            </div>
             {filterContent}
           </div>
         </div>

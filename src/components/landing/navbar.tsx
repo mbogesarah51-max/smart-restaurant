@@ -17,11 +17,17 @@ const navLinks = [
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
   const { isSignedIn, isLoaded } = useUser();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 20);
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(max > 0 ? (window.scrollY / max) * 100 : 0);
+    };
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -33,15 +39,20 @@ export function Navbar() {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-white/80 backdrop-blur-2xl border-b border-black/[0.06] shadow-[0_1px_20px_rgba(0,0,0,0.06)]"
+          ? "bg-white/75 backdrop-blur-2xl border-b border-black/[0.06] shadow-[0_1px_24px_rgba(26,20,17,0.07)]"
           : "bg-transparent"
       }`}
     >
+      {/* Scroll progress bar */}
+      <div
+        className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-brand-orange via-amber-500 to-brand-orange origin-left transition-[width] duration-150 ease-out"
+        style={{ width: `${progress}%`, opacity: scrolled ? 1 : 0 }}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-orange to-amber-500 flex items-center justify-center shadow-md shadow-brand-orange/20 group-hover:shadow-brand-orange/30 transition-shadow duration-300">
+            <div className="sheen w-9 h-9 rounded-xl bg-gradient-to-br from-brand-orange to-amber-500 flex items-center justify-center shadow-[0_4px_14px_-2px_rgba(249,115,22,0.4)] group-hover:shadow-[0_6px_18px_-2px_rgba(249,115,22,0.5)] group-hover:scale-105 transition-all duration-300">
               <UtensilsCrossed className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold font-heading text-brand-dark tracking-tight">

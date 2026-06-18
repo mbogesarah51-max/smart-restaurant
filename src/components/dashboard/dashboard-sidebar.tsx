@@ -16,11 +16,11 @@ export function DashboardSidebar({ user }: { user: SafeUser }) {
     .slice(0, 2);
 
   return (
-    <aside className="hidden lg:flex lg:flex-col lg:w-[260px] lg:border-r lg:border-border/40 lg:bg-white">
+    <aside className="hidden lg:flex lg:flex-col lg:w-[260px] lg:border-r lg:border-border/40 lg:bg-white/80 lg:backdrop-blur-xl">
       {/* Logo */}
       <div className="flex h-14 items-center gap-2.5 px-5 border-b border-border/40">
-        <Link href="/dashboard" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-orange to-amber-500 shadow-sm shadow-brand-orange/20">
+        <Link href="/dashboard" className="flex items-center gap-2.5 group">
+          <div className="sheen flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-orange to-amber-500 shadow-[0_4px_12px_-2px_rgba(249,115,22,0.4)] group-hover:scale-105 transition-transform duration-300">
             <UtensilsCrossed className="size-4 text-white" />
           </div>
           <span className="text-lg font-bold font-heading text-brand-dark">

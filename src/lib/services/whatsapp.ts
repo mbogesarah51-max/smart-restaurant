@@ -129,6 +129,25 @@ export function buildNewReservationMessage(
   );
 }
 
+export function buildReservationReminderMessage(
+  clientName: string,
+  date: Date | string,
+  time: string,
+  guestCount: number,
+  restaurantName: string,
+  actionUrl: string
+): string {
+  return (
+    `🔔 ChopWise — Reminder: Booking Still Waiting\n\n` +
+    `${clientName}'s request to book ${restaurantName} is still awaiting your response:\n\n` +
+    `👤 ${clientName}\n` +
+    `📅 ${formatDate(date)}\n` +
+    `🕐 ${time}\n` +
+    `👥 ${guestCount} guest${guestCount > 1 ? "s" : ""}\n\n` +
+    `Please accept or decline so the guest knows where they stand:\n${actionUrl}`
+  );
+}
+
 export function buildReservationAcceptedMessage(
   restaurantName: string,
   date: Date | string,

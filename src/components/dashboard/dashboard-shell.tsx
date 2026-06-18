@@ -14,7 +14,7 @@ export function DashboardShell({
 }) {
   return (
     <TooltipProvider>
-      <div className="flex h-screen overflow-hidden bg-brand-surface">
+      <div className="flex h-screen overflow-hidden bg-gradient-to-br from-brand-surface via-background to-brand-sand/30">
         <DashboardSidebar user={user} />
         <div className="flex flex-1 flex-col overflow-hidden">
           <DashboardTopbar user={user} />

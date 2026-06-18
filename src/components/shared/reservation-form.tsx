@@ -23,6 +23,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { BOOKING_FEE } from "@/lib/config";
 import { createReservation } from "@/app/actions/reservation";
 import { CountdownTimer } from "./countdown-timer";
 import type { RestaurantWithDetails } from "@/types";
@@ -573,7 +574,7 @@ function StepReview({ restaurant, date, time, guestCount, occasion, preferences,
 
       <div className="px-3 py-3 rounded-lg bg-amber-50 border border-amber-200">
         <p className="text-xs text-amber-800">
-          A booking fee of <strong>500 FCFA</strong> will be required after the restaurant confirms your reservation.
+          A booking fee of <strong>{formatPrice(BOOKING_FEE)}</strong> will be required after the restaurant confirms your reservation.
         </p>
       </div>
 

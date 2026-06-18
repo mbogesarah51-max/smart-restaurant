@@ -29,9 +29,11 @@ export function RestaurantCard({ restaurant, detailBasePath = "/dashboard/restau
   const amenities = restaurant.amenities.slice(0, 4);
   const extraCount = restaurant.amenities.length - 4;
 
+  const amenityIcon = (a: string) => AMENITY_ICONS[a];
+
   return (
     <Link href={`${detailBasePath}/${restaurant.slug}`} className="group block">
-      <div className="rounded-xl border border-border/50 bg-white overflow-hidden shadow-sm hover:shadow-md hover:border-brand-orange/20 transition-all duration-300 hover:-translate-y-0.5">
+      <div className="rounded-2xl border border-black/[0.05] bg-white overflow-hidden shadow-[0_1px_3px_rgba(26,20,17,0.04),0_8px_24px_-12px_rgba(26,20,17,0.1)] hover:shadow-[0_24px_48px_-18px_rgba(26,20,17,0.2)] hover:border-brand-orange/25 transition-all duration-400 hover:-translate-y-1.5">
         {/* Image */}
         <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-orange/20 to-amber-100">
           {restaurant.bannerImage ? (
@@ -39,7 +41,7 @@ export function RestaurantCard({ restaurant, detailBasePath = "/dashboard/restau
               src={restaurant.bannerImage}
               alt={restaurant.name}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="object-cover group-hover:scale-[1.07] transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
           ) : (
@@ -47,15 +49,17 @@ export function RestaurantCard({ restaurant, detailBasePath = "/dashboard/restau
               <UtensilsCrossed className="size-10 text-brand-orange/30" />
             </div>
           )}
+          {/* Gradient scrim for legibility */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
           {/* Price badge */}
-          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-sm text-xs font-bold text-foreground shadow-sm">
+          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/85 backdrop-blur-md text-xs font-bold text-foreground shadow-[0_2px_8px_rgba(0,0,0,0.12)] ring-1 ring-white/60">
             {price.icon}
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-4">
-          <h3 className="text-[15px] font-semibold text-foreground group-hover:text-brand-orange transition-colors line-clamp-1">
+        <div className="p-5">
+          <h3 className="text-base font-semibold font-heading text-foreground group-hover:text-brand-orange transition-colors line-clamp-1">
             {restaurant.name}
           </h3>
 
@@ -65,22 +69,26 @@ export function RestaurantCard({ restaurant, detailBasePath = "/dashboard/restau
           </div>
 
           {restaurant.description && (
-            <p className="text-xs text-muted-foreground mt-2 line-clamp-2 leading-relaxed">
+            <p className="text-xs text-muted-foreground mt-2.5 line-clamp-2 leading-relaxed">
               {restaurant.description}
             </p>
           )}
 
           {/* Amenities */}
           {amenities.length > 0 && (
-            <div className="flex items-center gap-1.5 mt-3 flex-wrap">
-              {amenities.map((a) => (
-                <span
-                  key={a}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted/60 text-[10px] font-medium text-muted-foreground"
-                >
-                  {a}
-                </span>
-              ))}
+            <div className="flex items-center gap-1.5 mt-3.5 flex-wrap">
+              {amenities.map((a) => {
+                const Icon = amenityIcon(a);
+                return (
+                  <span
+                    key={a}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-brand-cream/70 ring-1 ring-brand-orange/[0.08] text-[10px] font-medium text-brand-ink/70"
+                  >
+                    {Icon && <Icon className="size-2.5" />}
+                    {a}
+                  </span>
+                );
+              })}
               {extraCount > 0 && (
                 <span className="text-[10px] font-medium text-muted-foreground">
                   +{extraCount} more
@@ -90,12 +98,13 @@ export function RestaurantCard({ restaurant, detailBasePath = "/dashboard/restau
           )}
 
           {/* Footer */}
-          <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/40">
+          <div className="flex items-center justify-between mt-4 pt-3.5 border-t border-border/40">
             <span className="text-[11px] text-muted-foreground">
               {restaurant.menuItems.length} item{restaurant.menuItems.length !== 1 ? "s" : ""} on menu
             </span>
-            <span className="text-xs font-semibold text-brand-orange group-hover:translate-x-0.5 transition-transform">
-              View Details →
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-brand-orange">
+              View Details
+              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </span>
           </div>
         </div>
@@ -106,9 +115,9 @@ export function RestaurantCard({ restaurant, detailBasePath = "/dashboard/restau
 
 export function RestaurantCardSkeleton() {
   return (
-    <div className="rounded-xl border border-border/50 bg-white overflow-hidden shadow-sm">
+    <div className="rounded-2xl border border-black/[0.05] bg-white overflow-hidden shadow-[0_1px_3px_rgba(26,20,17,0.04),0_8px_24px_-12px_rgba(26,20,17,0.1)]">
       <div className="aspect-[16/10] bg-muted/50 animate-pulse" />
-      <div className="p-4 space-y-3">
+      <div className="p-5 space-y-3">
         <div className="h-4 bg-muted/50 rounded animate-pulse w-3/4" />
         <div className="h-3 bg-muted/50 rounded animate-pulse w-1/2" />
         <div className="h-3 bg-muted/50 rounded animate-pulse w-full" />

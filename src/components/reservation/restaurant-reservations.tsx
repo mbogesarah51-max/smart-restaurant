@@ -21,8 +21,10 @@ import {
   PartyPopper,
   AlertCircle,
   CreditCard,
+  Bell,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { BOOKING_FEE } from "@/lib/config";
 import { CountdownTimer } from "@/components/shared/countdown-timer";
 import { useReservationPolling } from "@/hooks/use-reservation-polling";
 import {
@@ -216,12 +218,20 @@ function ReservationCard({ reservation: r, tab, onAction }: {
             </div>
           </div>
 
-          {/* Countdown for new requests */}
-          {tab === "new" && r.responseDeadline && (
-            <CountdownTimer
-              deadline={r.responseDeadline}
-              onExpire={onAction}
-            />
+          {/* New requests: a soft "respond by" timer that turns into a
+              "reminder sent" badge once we've nudged the owner — it never cancels. */}
+          {tab === "new" && (
+            r.reminderSentAt ? (
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full whitespace-nowrap">
+                <Bell className="size-2.5" /> Reminder sent
+              </span>
+            ) : r.responseDeadline ? (
+              <CountdownTimer
+                deadline={r.responseDeadline}
+                onExpire={onAction}
+                expiredLabel="Awaiting reply"
+              />
+            ) : null
           )}
 
           {/* Payment deadline for pending_payment */}
@@ -412,7 +422,7 @@ function ReservationCard({ reservation: r, tab, onAction }: {
             {r.paidAt && (
               <div className="flex items-center gap-2 text-emerald-600">
                 <Check className="size-3" />
-                <span>Paid {formatPrice(r.bookingFee || 500)} on {new Date(r.paidAt).toLocaleDateString()}</span>
+                <span>Paid {formatPrice(r.bookingFee || BOOKING_FEE)} on {new Date(r.paidAt).toLocaleDateString()}</span>
               </div>
             )}
           </div>

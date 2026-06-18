@@ -47,14 +47,27 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* ChopWise Brand Colors */
+  /* ChopWise Brand Colors — premium warm palette */
   --color-brand-orange: #F97316;
   --color-brand-orange-hover: #EA580C;
+  --color-brand-ember: #C2410C;       /* deep roasted accent */
   --color-brand-yellow: #F59E0B;
-  --color-brand-dark: #1C1917;
+  --color-brand-gold: #D97706;        /* warm gold for premium accents */
+  --color-brand-dark: #1A1411;        /* near-espresso ink */
+  --color-brand-ink: #2A211B;         /* secondary heading ink */
   --color-brand-surface: #FFFBF5;
   --color-brand-green: #16A34A;
   --color-brand-cream: #FFF7ED;
+  --color-brand-sand: #FBEEE2;        /* soft tactile surface */
+
+  /* Premium shadow tokens (warm-tinted, layered) */
+  --shadow-soft: 0 1px 2px rgba(26, 20, 17, 0.04), 0 4px 12px rgba(26, 20, 17, 0.04);
+  --shadow-card: 0 1px 3px rgba(26, 20, 17, 0.05), 0 8px 24px -6px rgba(26, 20, 17, 0.08);
+  --shadow-lift: 0 4px 12px rgba(26, 20, 17, 0.06), 0 24px 48px -12px rgba(26, 20, 17, 0.14);
+  --shadow-glow: 0 8px 30px -6px rgba(249, 115, 22, 0.35);
+
+  /* Premium easing */
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :root {
@@ -99,20 +112,130 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
   html {
     @apply font-sans scroll-smooth;
+  }
+  /* Premium heading tracking */
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
+  }
+  /* Tabular figures for prices, counters, timers */
+  .tabular-nums,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
   }
 }
 
 @layer utilities {
   .text-gradient {
-    @apply bg-gradient-to-r from-brand-orange to-amber-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-brand-orange via-brand-gold to-amber-500 bg-clip-text text-transparent;
+  }
+  .text-gradient-ember {
+    @apply bg-gradient-to-br from-brand-orange via-brand-ember to-amber-600 bg-clip-text text-transparent;
   }
   .glass {
-    @apply bg-white/70 backdrop-blur-xl border border-black/[0.06] shadow-sm;
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_1px_3px_rgba(26,20,17,0.05),0_8px_24px_-6px_rgba(26,20,17,0.08)];
   }
   .glass-card {
-    @apply bg-white/70 backdrop-blur-xl border border-black/[0.06] rounded-2xl shadow-sm;
+    @apply bg-white/65 backdrop-blur-2xl border border-white/50 rounded-2xl shadow-[0_1px_3px_rgba(26,20,17,0.05),0_8px_24px_-6px_rgba(26,20,17,0.08)];
+  }
+  /* Premium layered shadows */
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-lift { box-shadow: var(--shadow-lift); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  /* Warm gradient surfaces */
+  .bg-mesh-warm {
+    background-image:
+      radial-gradient(at 12% 8%, rgba(249, 115, 22, 0.10) 0px, transparent 50%),
+      radial-gradient(at 88% 0%, rgba(245, 158, 11, 0.08) 0px, transparent 45%),
+      radial-gradient(at 50% 100%, rgba(251, 146, 60, 0.06) 0px, transparent 50%);
+  }
+  /* Subtle dotted grain for hero backdrops */
+  .bg-dotgrid {
+    background-image: radial-gradient(circle, rgba(26, 20, 17, 0.035) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  /* Premium card primitive */
+  .card-premium {
+    @apply rounded-3xl border border-black/[0.05] bg-white shadow-[0_1px_3px_rgba(26,20,17,0.05),0_8px_24px_-6px_rgba(26,20,17,0.08)];
+  }
+  /* Animated sheen for premium CTAs */
+  .sheen {
+    position: relative;
+    overflow: hidden;
+  }
+  .sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+    transform: translateX(-130%);
+    transition: transform 0.7s var(--ease-premium);
+    pointer-events: none;
+  }
+  .sheen:hover::after {
+    transform: translateX(130%);
+  }
+}
+
+/* Reveal-on-scroll primitive (GSAP/JS-driven; safe default = visible) */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  will-change: transform, opacity;
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.8s var(--ease-premium), transform 0.8s var(--ease-premium);
+}
+
+/* Perpetual float for hero ornaments */
+@keyframes cw-float {
+  0%, 100% { transform: translateY(calc(var(--float-distance, 14px) * -0.5)); }
+  50% { transform: translateY(calc(var(--float-distance, 14px) * 0.5)); }
+}
+
+/* Slow ambient drift for background blobs */
+@keyframes cw-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(3%, -2%) scale(1.04); }
+  66% { transform: translate(-2%, 3%) scale(0.98); }
+}
+.animate-drift { animation: cw-drift 22s ease-in-out infinite; }
+
+/* Marquee for logo / trust strips */
+@keyframes cw-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee { animation: cw-marquee 32s linear infinite; }
+
+/* Shimmer for skeletons */
+@keyframes cw-shimmer {
+  100% { transform: translateX(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .animate-drift,
+  .animate-marquee {
+    animation: none !important;
   }
 }

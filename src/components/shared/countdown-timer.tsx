@@ -7,9 +7,11 @@ interface CountdownTimerProps {
   deadline: Date | string;
   onExpire?: () => void;
   className?: string;
+  /** Text shown once the countdown reaches zero. Defaults to "Expired". */
+  expiredLabel?: string;
 }
 
-export function CountdownTimer({ deadline, onExpire, className = "" }: CountdownTimerProps) {
+export function CountdownTimer({ deadline, onExpire, className = "", expiredLabel = "Expired" }: CountdownTimerProps) {
   const [remaining, setRemaining] = useState(() => getRemaining(deadline));
 
   useEffect(() => {
@@ -25,7 +27,7 @@ export function CountdownTimer({ deadline, onExpire, className = "" }: Countdown
   }, [deadline, onExpire]);
 
   if (remaining.total <= 0) {
-    return <span className={`text-destructive font-medium text-sm ${className}`}>Expired</span>;
+    return <span className={`text-muted-foreground font-medium text-sm ${className}`}>{expiredLabel}</span>;
   }
 
   const isUrgent = remaining.total < 120000; // under 2 min

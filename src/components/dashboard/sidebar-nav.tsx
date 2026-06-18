@@ -84,14 +84,17 @@ export function SidebarNav({
             key={item.href}
             href={item.href}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150",
+              "group/nav relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200",
               active
-                ? "bg-brand-orange/10 text-brand-orange"
-                : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
+                ? "bg-gradient-to-r from-brand-orange/[0.12] to-amber-400/[0.06] text-brand-orange shadow-[inset_0_0_0_1px_rgba(249,115,22,0.12)]"
+                : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
               collapsed && "justify-center px-2.5"
             )}
           >
-            <item.icon className={cn("shrink-0", collapsed ? "size-5" : "size-[18px]")} />
+            {active && !collapsed && (
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-brand-orange" />
+            )}
+            <item.icon className={cn("shrink-0 transition-transform duration-200 group-hover/nav:scale-110", collapsed ? "size-5" : "size-[18px]")} />
             {!collapsed && <span>{item.label}</span>}
           </Link>
         );
@@ -131,10 +134,10 @@ export function MobileSidebarNav({
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-all duration-150",
+              "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200",
               active
-                ? "bg-brand-orange/10 text-brand-orange"
-                : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                ? "bg-gradient-to-r from-brand-orange/[0.12] to-amber-400/[0.06] text-brand-orange shadow-[inset_0_0_0_1px_rgba(249,115,22,0.12)]"
+                : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
             )}
           >
             <item.icon className="size-[18px] shrink-0" />

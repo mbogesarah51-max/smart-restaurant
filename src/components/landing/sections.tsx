@@ -6,12 +6,12 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  FadeIn,
-  StaggerContainer,
+  Reveal as FadeIn,
+  Stagger as StaggerContainer,
   StaggerItem,
-  AnimatedCounter,
+  Counter as AnimatedCounter,
   Float,
-} from "./motion";
+} from "./reveal";
 import {
   Search,
   CalendarCheck,
@@ -30,7 +30,6 @@ import {
   Clock,
   Heart,
   Send,
-  Check,
   Wifi,
   ChevronLeft,
   ChevronRight,
@@ -44,20 +43,16 @@ import {
    ═══════════════════════════════════════════════════════════════════ */
 export function HeroSection() {
   return (
-    <section className="relative min-h-[100dvh] flex items-center pt-20 overflow-hidden">
-      {/* Warm ambient background */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-brand-orange/[0.06] rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-amber-400/[0.05] rounded-full blur-[100px]" />
-        <div className="absolute top-1/3 left-0 w-[400px] h-[400px] bg-orange-200/[0.08] rounded-full blur-[80px]" />
-        {/* Subtle dot pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.3]"
-          style={{
-            backgroundImage: "radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px)",
-            backgroundSize: "32px 32px",
-          }}
-        />
+    <section className="relative min-h-[100dvh] flex items-center pt-20 overflow-hidden bg-mesh-warm">
+      {/* Warm ambient background with slow drift */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-brand-orange/[0.07] rounded-full blur-[130px] animate-drift" />
+        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-amber-400/[0.06] rounded-full blur-[110px] animate-drift [animation-delay:-7s]" />
+        <div className="absolute top-1/3 left-0 w-[440px] h-[440px] bg-orange-200/[0.10] rounded-full blur-[90px] animate-drift [animation-delay:-14s]" />
+        {/* Subtle dot grid */}
+        <div className="absolute inset-0 bg-dotgrid opacity-[0.5]" />
+        {/* Top fade for nav legibility */}
+        <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-background to-transparent" />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
@@ -65,19 +60,22 @@ export function HeroSection() {
           {/* Left — Copy */}
           <div className="max-w-xl">
             <FadeIn>
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-orange/20 bg-brand-orange/[0.06] mb-8">
-                <Sparkles className="w-3.5 h-3.5 text-brand-orange" />
-                <span className="text-xs font-medium text-brand-orange tracking-wide uppercase">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-orange/20 bg-white/70 backdrop-blur-sm shadow-[0_2px_10px_-3px_rgba(249,115,22,0.25)] mb-8">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-brand-orange opacity-60 animate-ping" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-orange" />
+                </span>
+                <span className="text-xs font-semibold text-brand-ember tracking-wide uppercase">
                   AI-Powered Restaurant Discovery
                 </span>
               </div>
             </FadeIn>
 
             <FadeIn delay={0.1}>
-              <h1 className="text-[2.75rem] sm:text-5xl lg:text-6xl xl:text-[4.25rem] font-extrabold font-heading leading-[1.08] tracking-tight text-brand-dark">
+              <h1 className="text-[2.75rem] sm:text-5xl lg:text-6xl xl:text-[4.25rem] font-extrabold font-heading leading-[1.05] tracking-[-0.03em] text-brand-dark">
                 Discover, Reserve
                 <br />
-                <span className="text-gradient">&amp; Dine</span> — All
+                <span className="text-gradient-ember">&amp; Dine</span> — All
                 <br className="hidden sm:block" /> in One Place
               </h1>
             </FadeIn>
@@ -95,17 +93,17 @@ export function HeroSection() {
                 <Link href="/explore">
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-brand-orange to-amber-500 hover:from-brand-orange-hover hover:to-amber-600 text-white font-semibold px-8 h-13 text-base rounded-xl shadow-lg shadow-brand-orange/20 hover:shadow-brand-orange/30 transition-all duration-300 w-full sm:w-auto"
+                    className="sheen bg-gradient-to-r from-brand-orange to-amber-500 hover:from-brand-orange-hover hover:to-amber-600 text-white font-semibold px-8 h-13 text-base rounded-xl shadow-[0_8px_30px_-6px_rgba(249,115,22,0.45)] hover:shadow-[0_12px_36px_-6px_rgba(249,115,22,0.55)] hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto"
                   >
                     Find a Restaurant
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover/button:translate-x-0.5" />
                   </Button>
                 </Link>
                 <Link href="/sign-up?role=owner">
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-brand-dark/10 hover:border-brand-orange/30 hover:bg-brand-orange/5 h-13 text-base rounded-xl w-full sm:w-auto text-foreground"
+                    className="border-brand-dark/10 bg-white/60 backdrop-blur-sm hover:border-brand-orange/30 hover:bg-brand-orange/5 h-13 text-base rounded-xl w-full sm:w-auto text-foreground"
                   >
                     List Your Restaurant
                   </Button>
@@ -343,12 +341,15 @@ export function SocialProofSection() {
   ];
 
   return (
-    <section className="relative py-16 lg:py-20 border-y border-black/[0.04] bg-brand-cream/50">
+    <section className="relative py-16 lg:py-20 border-y border-black/[0.04] bg-gradient-to-b from-brand-cream/60 to-brand-sand/30">
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <StaggerContainer className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+        <StaggerContainer className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           {stats.map((stat) => (
-            <StaggerItem key={stat.label} className="text-center group">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-orange/[0.08] mb-4 group-hover:bg-brand-orange/[0.12] transition-colors">
+            <StaggerItem
+              key={stat.label}
+              className="group text-center rounded-3xl border border-black/[0.05] bg-white/70 backdrop-blur-sm px-4 py-7 shadow-[0_1px_3px_rgba(26,20,17,0.04),0_10px_30px_-14px_rgba(26,20,17,0.1)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_36px_-12px_rgba(249,115,22,0.2)]"
+            >
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 ring-1 ring-brand-orange/10 mb-4 group-hover:scale-110 transition-transform duration-300">
                 <stat.icon className="w-5 h-5 text-brand-orange" />
               </div>
               <div className="text-3xl sm:text-4xl font-bold text-brand-dark font-heading">
@@ -423,7 +424,7 @@ export function FeaturesSection() {
           {features.map((feature) => (
             <StaggerItem key={feature.title}>
               <div
-                className={`group relative h-full rounded-3xl border border-black/[0.06] ${feature.borderHover} bg-white p-8 lg:p-10 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/[0.04]`}
+                className={`group relative h-full rounded-3xl border border-black/[0.05] ${feature.borderHover} bg-white p-8 lg:p-10 shadow-[0_1px_3px_rgba(26,20,17,0.04),0_8px_24px_-12px_rgba(26,20,17,0.08)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_24px_48px_-16px_rgba(26,20,17,0.16)]`}
               >
                 <div
                   className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
@@ -431,7 +432,7 @@ export function FeaturesSection() {
 
                 <div className="relative">
                   <div
-                    className={`w-14 h-14 rounded-2xl ${feature.iconBg} flex items-center justify-center mb-6`}
+                    className={`w-14 h-14 rounded-2xl ${feature.iconBg} ring-1 ring-black/[0.04] flex items-center justify-center mb-6 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-3`}
                   >
                     <feature.icon className={`w-7 h-7 ${feature.iconColor}`} />
                   </div>
@@ -851,8 +852,8 @@ export function ForRestaurantsSection() {
         <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {benefits.map((benefit) => (
             <StaggerItem key={benefit.title}>
-              <div className="group h-full rounded-3xl border border-black/[0.06] hover:border-brand-orange/20 bg-white p-7 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/[0.04] text-center">
-                <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center mx-auto mb-5 group-hover:bg-orange-100 transition-colors">
+              <div className="group h-full rounded-3xl border border-black/[0.05] hover:border-brand-orange/20 bg-white p-7 shadow-[0_1px_3px_rgba(26,20,17,0.04),0_8px_24px_-14px_rgba(26,20,17,0.08)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_24px_48px_-16px_rgba(26,20,17,0.16)] text-center">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 ring-1 ring-brand-orange/10 flex items-center justify-center mx-auto mb-5 transition-transform duration-500 group-hover:scale-110">
                   <benefit.icon className="w-7 h-7 text-brand-orange" />
                 </div>
                 <h3 className="text-lg font-bold font-heading text-brand-dark mb-2">
@@ -877,151 +878,6 @@ export function ForRestaurantsSection() {
             </Button>
           </Link>
         </FadeIn>
-      </div>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   PRICING
-   ═══════════════════════════════════════════════════════════════════ */
-export function PricingSection() {
-  const plans = [
-    {
-      name: "Diner",
-      price: "Free",
-      period: "forever",
-      description: "For food lovers who want to discover and book restaurants.",
-      features: [
-        "Browse all restaurants",
-        "Instant reservations",
-        "AI recommendations",
-        "WhatsApp confirmations",
-        "Save favorites",
-      ],
-      cta: "Start Dining",
-      href: "/sign-up",
-      popular: false,
-    },
-    {
-      name: "Restaurant Basic",
-      price: "Free",
-      period: "to get started",
-      description: "List your restaurant and start receiving bookings today.",
-      features: [
-        "Restaurant listing",
-        "Up to 50 bookings/month",
-        "WhatsApp notifications",
-        "Basic analytics",
-        "Menu management",
-      ],
-      cta: "List Your Restaurant",
-      href: "/sign-up?role=owner",
-      popular: true,
-    },
-    {
-      name: "Restaurant Pro",
-      price: "15,000",
-      currency: "FCFA",
-      period: "/month",
-      description: "For busy restaurants that want to maximize growth.",
-      features: [
-        "Everything in Basic",
-        "Unlimited bookings",
-        "Advanced analytics",
-        "Priority listing",
-        "AI description generator",
-        "Dedicated support",
-      ],
-      cta: "Go Pro",
-      href: "/sign-up?role=owner",
-      popular: false,
-    },
-  ];
-
-  return (
-    <section id="pricing" className="py-24 lg:py-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <FadeIn className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-black/[0.06] bg-black/[0.02] mb-6">
-            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-              Pricing
-            </span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-heading tracking-tight text-brand-dark">
-            Simple,{" "}
-            <span className="text-gradient">Transparent</span> Pricing
-          </h2>
-          <p className="mt-5 text-lg text-muted-foreground leading-relaxed">
-            Start free. No hidden fees. Only pay when you need more power.
-          </p>
-        </FadeIn>
-
-        <StaggerContainer className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
-          {plans.map((plan) => (
-            <StaggerItem key={plan.name}>
-              <div
-                className={`relative h-full rounded-3xl border p-8 transition-all duration-500 hover:-translate-y-1 ${
-                  plan.popular
-                    ? "border-brand-orange/30 bg-gradient-to-b from-orange-50/80 to-white shadow-xl shadow-brand-orange/[0.08]"
-                    : "border-black/[0.06] bg-white hover:border-black/[0.1] hover:shadow-lg hover:shadow-black/[0.04]"
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-brand-orange to-amber-500 text-white text-xs font-semibold shadow-md shadow-brand-orange/25">
-                    Most Popular
-                  </div>
-                )}
-
-                <div className="mb-6">
-                  <h3 className="text-lg font-bold font-heading text-brand-dark">
-                    {plan.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {plan.description}
-                  </p>
-                </div>
-
-                <div className="mb-8">
-                  <div className="flex items-baseline gap-1">
-                    {plan.currency && (
-                      <span className="text-sm text-muted-foreground">
-                        {plan.currency}
-                      </span>
-                    )}
-                    <span className="text-4xl font-extrabold font-heading text-brand-dark">
-                      {plan.price}
-                    </span>
-                  </div>
-                  <span className="text-sm text-muted-foreground">
-                    {plan.period}
-                  </span>
-                </div>
-
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-3 text-sm">
-                      <Check className="w-4 h-4 text-brand-orange flex-shrink-0" />
-                      <span className="text-muted-foreground">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Link href={plan.href} className="block">
-                  <Button
-                    className={`w-full rounded-xl h-12 font-semibold transition-all duration-300 ${
-                      plan.popular
-                        ? "bg-gradient-to-r from-brand-orange to-amber-500 hover:from-brand-orange-hover hover:to-amber-600 text-white shadow-md shadow-brand-orange/20 hover:shadow-brand-orange/30"
-                        : "bg-brand-surface border border-black/[0.06] hover:bg-orange-50 text-brand-dark"
-                    }`}
-                  >
-                    {plan.cta}
-                  </Button>
-                </Link>
-              </div>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
       </div>
     </section>
   );
@@ -1229,14 +1085,15 @@ export function TestimonialsSection() {
    ═══════════════════════════════════════════════════════════════════ */
 export function CTASection() {
   return (
-    <section className="py-24 lg:py-32 relative overflow-hidden">
+    <section className="py-24 lg:py-32 relative overflow-hidden bg-mesh-warm">
       {/* Warm glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-brand-orange/[0.06] rounded-full blur-[120px]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-brand-orange/[0.07] rounded-full blur-[130px] animate-drift" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-50/30 to-transparent" />
+      <div className="absolute inset-0 bg-dotgrid opacity-30" />
 
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <FadeIn>
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-orange-50 mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-br from-orange-50 to-amber-50 ring-1 ring-brand-orange/15 shadow-[0_8px_24px_-8px_rgba(249,115,22,0.3)] mb-8">
             <ChefHat className="w-8 h-8 text-brand-orange" />
           </div>
 
@@ -1255,17 +1112,17 @@ export function CTASection() {
             <Link href="/explore">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-brand-orange to-amber-500 hover:from-brand-orange-hover hover:to-amber-600 text-white font-semibold px-10 h-13 text-base rounded-xl shadow-lg shadow-brand-orange/20 hover:shadow-brand-orange/30 transition-all duration-300 w-full sm:w-auto"
+                className="sheen bg-gradient-to-r from-brand-orange to-amber-500 hover:from-brand-orange-hover hover:to-amber-600 text-white font-semibold px-10 h-13 text-base rounded-xl shadow-[0_8px_30px_-6px_rgba(249,115,22,0.45)] hover:shadow-[0_12px_36px_-6px_rgba(249,115,22,0.55)] hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto"
               >
                 Explore Restaurants
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover/button:translate-x-0.5" />
               </Button>
             </Link>
             <Link href="/sign-up?role=owner">
               <Button
                 size="lg"
                 variant="outline"
-                className="border-brand-orange/30 text-brand-orange hover:bg-brand-orange/5 h-13 text-base rounded-xl w-full sm:w-auto"
+                className="border-brand-orange/30 bg-white/60 backdrop-blur-sm text-brand-orange hover:bg-brand-orange/5 h-13 text-base rounded-xl w-full sm:w-auto"
               >
                 Register Your Restaurant
               </Button>
@@ -1323,7 +1180,7 @@ export function Footer() {
               Platform
             </h4>
             <ul className="space-y-3">
-              {["Features", "How It Works", "Pricing", "For Restaurants"].map(
+              {["Features", "How It Works", "For Restaurants"].map(
                 (link) => (
                   <li key={link}>
                     <a
@@ -1377,8 +1234,10 @@ export function Footer() {
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} ChopWise. All rights reserved.
           </p>
-          <p className="text-xs text-muted-foreground">
-            Made with ❤️ in Cameroon
+          <p className="text-xs text-muted-foreground inline-flex items-center gap-1.5">
+            Made with
+            <Heart className="w-3.5 h-3.5 fill-brand-orange text-brand-orange" />
+            in Cameroon
           </p>
         </div>
       </div>

@@ -6,12 +6,13 @@ export default function AuthLayout({
   return (
     <div className="min-h-screen flex">
       {/* Branding Side */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-orange-50 via-brand-cream to-amber-50">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-orange-50 via-brand-cream to-amber-50 bg-mesh-warm">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--color-brand-orange)_0%,_transparent_50%)] opacity-[0.08]" />
+        <div className="absolute inset-0 bg-dotgrid opacity-40" />
         <div className="relative z-10 flex flex-col justify-center px-16 xl:px-24">
           {/* Logo */}
           <div className="flex items-center gap-3 mb-12">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-orange to-amber-500 flex items-center justify-center shadow-lg shadow-brand-orange/20">
+            <div className="sheen w-12 h-12 rounded-xl bg-gradient-to-br from-brand-orange to-amber-500 flex items-center justify-center shadow-[0_8px_24px_-6px_rgba(249,115,22,0.45)]">
               <svg
                 viewBox="0 0 24 24"
                 className="w-7 h-7 text-white"
@@ -58,8 +59,8 @@ export default function AuthLayout({
         </div>
 
         {/* Decorative elements */}
-        <div className="absolute bottom-0 right-0 w-64 h-64 bg-brand-orange/[0.06] rounded-full blur-3xl" />
-        <div className="absolute top-20 right-20 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl" />
+        <div className="absolute bottom-0 right-0 w-64 h-64 bg-brand-orange/[0.07] rounded-full blur-3xl animate-drift" />
+        <div className="absolute top-20 right-20 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl animate-drift [animation-delay:-9s]" />
       </div>
 
       {/* Form Side */}
