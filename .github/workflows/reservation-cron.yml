@@ -1,0 +1,35 @@
+name: Reservation cron (reminders + expiry)
+
+# Hobby Vercel can only run crons once/day, which is too slow for the
+# 10-min owner reminder and 30-min payment expiry. This pings the same
+# endpoint every ~5 minutes (GitHub Actions' minimum interval) instead.
+#
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#   CRON_ENDPOINT  full URL, e.g. https://your-app.vercel.app/api/cron/check-expired-reservations
+#   CRON_SECRET    same value as the CRON_SECRET env var in Vercel
+#
+# Notes:
+#   - GitHub may delay scheduled runs by a few minutes under load.
+#   - Scheduled workflows are auto-disabled after 60 days of repo inactivity;
+#     a push (or manually re-enabling) resumes them.
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+
+# Avoid overlapping runs if one ping is slow.
+concurrency:
+  group: reservation-cron
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger check-expired-reservations
+        run: |
+          curl -fsS --retry 3 --retry-delay 5 --max-time 60 \
+            -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.CRON_ENDPOINT }}"
