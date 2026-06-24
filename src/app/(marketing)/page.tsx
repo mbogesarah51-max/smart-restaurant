@@ -1,4 +1,6 @@
 import { Navbar } from "@/components/landing/navbar";
+import { FeaturedRestaurantsSection } from "@/components/landing/featured-restaurants";
+import { getLandingStats } from "@/app/actions/landing";
 import {
   HeroSection,
   SocialProofSection,
@@ -9,17 +11,22 @@ import {
   TestimonialsSection,
   CTASection,
   Footer,
-} from "@/components/landing/sections";
+} from "@/components/landing/foodie-sections";
 
-export default function LandingPage() {
+export const dynamic = "force-dynamic";
+
+export default async function LandingPage() {
+  const stats = await getLandingStats();
+
   return (
-    <main className="min-h-screen bg-background overflow-x-hidden">
+    <main className="min-h-screen overflow-x-hidden bg-background">
       <Navbar />
       <HeroSection />
-      <SocialProofSection />
+      <SocialProofSection stats={stats} />
+      <AIShowcaseSection />
+      <FeaturedRestaurantsSection />
       <FeaturesSection />
       <HowItWorksSection />
-      <AIShowcaseSection />
       <ForRestaurantsSection />
       <TestimonialsSection />
       <CTASection />
