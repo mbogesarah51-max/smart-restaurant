@@ -143,3 +143,8 @@
 .dark img {
   color-scheme: only light;
 }
+
+/* Keep pending counters readable and steady instead of blinking. */
+button > span.animate-pulse {
+  animation: none !important;
+}
