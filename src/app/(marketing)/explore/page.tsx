@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/landing/navbar";
 import { FoodieFooter } from "@/components/landing/foodie-footer";
 import { searchRestaurants, type SearchParams } from "@/app/actions/restaurant";
+import { ensureExpandedDemoRestaurants } from "@/lib/expanded-demo-restaurants";
 import { RealisticExplore } from "@/components/restaurant/realistic-explore";
 
 interface Props {
@@ -13,6 +14,7 @@ export const metadata = {
 };
 
 export default async function PublicExplorePage({ searchParams }: Props) {
+  await ensureExpandedDemoRestaurants();
   const params = await searchParams;
 
   const search: SearchParams = {
