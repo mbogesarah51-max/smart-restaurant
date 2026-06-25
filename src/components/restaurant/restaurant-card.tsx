@@ -2,132 +2,115 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Wifi, Car, Wind, TreePine, UtensilsCrossed } from "lucide-react";
+import { Car, MapPin, Star, TreePine, UtensilsCrossed, Wifi, Wind } from "lucide-react";
 import type { Restaurant } from "@/generated/prisma/client";
+import { formatPrice } from "@/lib/utils";
 
-const PRICE_LABELS: Record<string, { icon: string; label: string }> = {
-  BUDGET: { icon: "$", label: "Budget" },
-  MODERATE: { icon: "$$", label: "Moderate" },
-  PREMIUM: { icon: "$$$", label: "Premium" },
-  LUXURY: { icon: "$$$$", label: "Luxury" },
+const PRICE_LABELS: Record<string, { label: string; range: string }> = {
+  BUDGET: { label: "Budget-friendly", range: "2,000–5,000 FCFA" },
+  MODERATE: { label: "Mid-range", range: "5,000–10,000 FCFA" },
+  PREMIUM: { label: "Premium", range: "10,000–20,000 FCFA" },
+  LUXURY: { label: "Luxury", range: "20,000+ FCFA" },
 };
 
 const AMENITY_ICONS: Record<string, typeof Wifi> = {
   "Wi-Fi": Wifi,
-  "Parking": Car,
+  Parking: Car,
   "Air Conditioning": Wind,
   "Outdoor Seating": TreePine,
 };
 
+interface MenuPreviewItem {
+  id: string;
+  name?: string;
+  price?: number;
+  image?: string | null;
+}
+
 interface RestaurantCardProps {
-  restaurant: Restaurant & { menuItems: { id: string }[] };
+  restaurant: Restaurant & { menuItems: MenuPreviewItem[] };
   detailBasePath?: string;
 }
 
 export function RestaurantCard({ restaurant, detailBasePath = "/dashboard/restaurants" }: RestaurantCardProps) {
   const price = PRICE_LABELS[restaurant.priceRange] || PRICE_LABELS.MODERATE;
-  const amenities = restaurant.amenities.slice(0, 4);
-  const extraCount = restaurant.amenities.length - 4;
-
-  const amenityIcon = (a: string) => AMENITY_ICONS[a];
+  const amenities = restaurant.amenities.slice(0, 3);
+  const extraCount = Math.max(restaurant.amenities.length - 3, 0);
+  const pricedItems = restaurant.menuItems.filter((item) => typeof item.price === "number");
+  const startingPrice = pricedItems.length > 0 ? Math.min(...pricedItems.map((item) => item.price as number)) : null;
+  const signatureDish = pricedItems[0];
 
   return (
-    <Link href={`${detailBasePath}/${restaurant.slug}`} className="group block">
-      <div className="rounded-2xl border border-black/[0.05] bg-white overflow-hidden shadow-[0_1px_3px_rgba(26,20,17,0.04),0_8px_24px_-12px_rgba(26,20,17,0.1)] hover:shadow-[0_24px_48px_-18px_rgba(26,20,17,0.2)] hover:border-brand-orange/25 transition-all duration-400 hover:-translate-y-1.5">
-        {/* Image */}
-        <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-orange/20 to-amber-100">
+    <Link href={`${detailBasePath}/${restaurant.slug}`} className="group block h-full">
+      <article className="flex h-full flex-col overflow-hidden rounded-3xl border border-black/[0.06] bg-white shadow-[0_12px_40px_-24px_rgba(15,23,42,0.35)] transition-all duration-300 hover:-translate-y-1.5 hover:border-orange-200 hover:shadow-[0_24px_55px_-24px_rgba(249,115,22,0.42)]">
+        <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-orange-100 to-amber-50">
           {restaurant.bannerImage ? (
             <Image
               src={restaurant.bannerImage}
-              alt={restaurant.name}
+              alt={`${restaurant.name} restaurant and food`}
               fill
-              className="object-cover group-hover:scale-[1.07] transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <UtensilsCrossed className="size-10 text-brand-orange/30" />
-            </div>
+            <div className="absolute inset-0 flex items-center justify-center"><UtensilsCrossed className="size-10 text-orange-300" /></div>
           )}
-          {/* Gradient scrim for legibility */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
-          {/* Price badge */}
-          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/85 backdrop-blur-md text-xs font-bold text-foreground shadow-[0_2px_8px_rgba(0,0,0,0.12)] ring-1 ring-white/60">
-            {price.icon}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/5 to-transparent" />
+          <div className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-[11px] font-black text-slate-900 shadow-sm">
+            {price.label}
+          </div>
+          <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
+            <Star className="size-3 fill-white" /> Verified listing
+          </div>
+          <div className="absolute inset-x-0 bottom-0 p-4 text-white">
+            <h3 className="font-heading text-xl font-black leading-tight">{restaurant.name}</h3>
+            <p className="mt-1 flex items-center gap-1 text-xs text-white/85"><MapPin className="size-3.5" /> {restaurant.address}, {restaurant.city}</p>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="p-5">
-          <h3 className="text-base font-semibold font-heading text-foreground group-hover:text-brand-orange transition-colors line-clamp-1">
-            {restaurant.name}
-          </h3>
+        <div className="flex flex-1 flex-col p-5">
+          <p className="line-clamp-2 text-sm leading-6 text-slate-500">
+            {restaurant.description || "Discover a memorable dining experience with locally relevant menus and a welcoming atmosphere."}
+          </p>
 
-          <div className="flex items-center gap-1 mt-1.5 text-muted-foreground">
-            <MapPin className="size-3 shrink-0" />
-            <span className="text-xs truncate">{restaurant.address}, {restaurant.city}</span>
-          </div>
-
-          {restaurant.description && (
-            <p className="text-xs text-muted-foreground mt-2.5 line-clamp-2 leading-relaxed">
-              {restaurant.description}
-            </p>
+          {signatureDish?.name && (
+            <div className="mt-4 rounded-2xl bg-orange-50 px-4 py-3 ring-1 ring-orange-100">
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-orange-600">Popular menu choice</p>
+              <div className="mt-1 flex items-center justify-between gap-3">
+                <span className="truncate text-sm font-bold text-slate-900">{signatureDish.name}</span>
+                {typeof signatureDish.price === "number" && <span className="shrink-0 text-xs font-black text-orange-700">{formatPrice(signatureDish.price)}</span>}
+              </div>
+            </div>
           )}
 
-          {/* Amenities */}
           {amenities.length > 0 && (
-            <div className="flex items-center gap-1.5 mt-3.5 flex-wrap">
-              {amenities.map((a) => {
-                const Icon = amenityIcon(a);
-                return (
-                  <span
-                    key={a}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-brand-cream/70 ring-1 ring-brand-orange/[0.08] text-[10px] font-medium text-brand-ink/70"
-                  >
-                    {Icon && <Icon className="size-2.5" />}
-                    {a}
-                  </span>
-                );
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {amenities.map((amenity) => {
+                const Icon = AMENITY_ICONS[amenity];
+                return <span key={amenity} className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-600 ring-1 ring-slate-100">{Icon && <Icon className="size-2.5" />}{amenity}</span>;
               })}
-              {extraCount > 0 && (
-                <span className="text-[10px] font-medium text-muted-foreground">
-                  +{extraCount} more
-                </span>
-              )}
+              {extraCount > 0 && <span className="rounded-full bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-500">+{extraCount} more</span>}
             </div>
           )}
 
-          {/* Footer */}
-          <div className="flex items-center justify-between mt-4 pt-3.5 border-t border-border/40">
-            <span className="text-[11px] text-muted-foreground">
-              {restaurant.menuItems.length} item{restaurant.menuItems.length !== 1 ? "s" : ""} on menu
-            </span>
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-brand-orange">
-              View Details
-              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
-            </span>
+          <div className="mt-auto flex items-end justify-between gap-3 border-t border-slate-100 pt-4">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Typical budget</p>
+              <p className="mt-1 text-sm font-black text-slate-900">{startingPrice ? `From ${formatPrice(startingPrice)}` : price.range}</p>
+            </div>
+            <span className="inline-flex items-center gap-1 text-xs font-black text-orange-600">View menu <span className="transition-transform group-hover:translate-x-1">→</span></span>
           </div>
         </div>
-      </div>
+      </article>
     </Link>
   );
 }
 
 export function RestaurantCardSkeleton() {
   return (
-    <div className="rounded-2xl border border-black/[0.05] bg-white overflow-hidden shadow-[0_1px_3px_rgba(26,20,17,0.04),0_8px_24px_-12px_rgba(26,20,17,0.1)]">
-      <div className="aspect-[16/10] bg-muted/50 animate-pulse" />
-      <div className="p-5 space-y-3">
-        <div className="h-4 bg-muted/50 rounded animate-pulse w-3/4" />
-        <div className="h-3 bg-muted/50 rounded animate-pulse w-1/2" />
-        <div className="h-3 bg-muted/50 rounded animate-pulse w-full" />
-        <div className="h-3 bg-muted/50 rounded animate-pulse w-2/3" />
-        <div className="flex gap-1.5 pt-1">
-          <div className="h-5 w-12 bg-muted/50 rounded-full animate-pulse" />
-          <div className="h-5 w-14 bg-muted/50 rounded-full animate-pulse" />
-          <div className="h-5 w-10 bg-muted/50 rounded-full animate-pulse" />
-        </div>
-      </div>
+    <div className="overflow-hidden rounded-3xl border border-black/[0.05] bg-white shadow-sm">
+      <div className="aspect-[16/10] animate-pulse bg-muted/50" />
+      <div className="space-y-3 p-5"><div className="h-5 w-3/4 animate-pulse rounded bg-muted/50" /><div className="h-3 w-full animate-pulse rounded bg-muted/50" /><div className="h-3 w-2/3 animate-pulse rounded bg-muted/50" /><div className="h-14 animate-pulse rounded-2xl bg-muted/50" /></div>
     </div>
   );
 }
