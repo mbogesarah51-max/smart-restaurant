@@ -12,12 +12,16 @@ export function FoodieHero() {
   const [city, setCity] = useState("Douala");
   const [search, setSearch] = useState("");
 
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function goToExplore(query: string) {
     const params = new URLSearchParams();
     if (city) params.set("city", city);
-    if (search.trim()) params.set("search", search.trim());
+    if (query.trim()) params.set("q", query.trim());
     router.push(`/explore?${params.toString()}`);
+  }
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    goToExplore(search);
   }
 
   return (
@@ -60,7 +64,7 @@ export function FoodieHero() {
             {["Traditional food", "Family outing", "Business lunch", "Under 5,000 FCFA"].map((item) => (
               <button
                 key={item}
-                onClick={() => router.push(`/explore?city=${encodeURIComponent(city)}&search=${encodeURIComponent(item)}`)}
+                onClick={() => goToExplore(item)}
                 className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 backdrop-blur-md hover:bg-white/20"
               >
                 {item}
