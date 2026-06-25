@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/app/actions/auth";
+import { ensureExpandedDemoRestaurants } from "@/lib/expanded-demo-restaurants";
 import { AIRecommend } from "@/components/dashboard/ai-recommend";
 
 export const metadata: Metadata = {
@@ -14,5 +15,6 @@ export default async function AIRecommendPage() {
   if (user.role === "RESTAURANT_OWNER") redirect("/dashboard/restaurant");
   if (user.role === "ADMIN") redirect("/dashboard/admin");
 
+  await ensureExpandedDemoRestaurants();
   return <AIRecommend />;
 }

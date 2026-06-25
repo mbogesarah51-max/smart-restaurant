@@ -1,0 +1,12 @@
+.border-brand-orange\/30.bg-brand-orange\/5 .text-\[11px\].text-muted-foreground.text-center.mt-2 {
+  font-size: 0 !important;
+}
+
+.border-brand-orange\/30.bg-brand-orange\/5 .text-\[11px\].text-muted-foreground.text-center.mt-2::after {
+  content: "Reservation fee: 2,000 FCFA — required to confirm the table after the restaurant accepts your request.";
+  display: inline-block;
+  max-width: 22rem;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #6b7280;
+}

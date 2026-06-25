@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getRestaurantBySlug } from "@/app/actions/restaurant";
+import { ensureExpandedDemoRestaurants } from "@/lib/expanded-demo-restaurants";
 import { RestaurantDetail } from "@/components/restaurant/restaurant-detail";
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  await ensureExpandedDemoRestaurants();
   const { slug } = await params;
   const restaurant = await getRestaurantBySlug(slug);
   if (!restaurant) return { title: "Restaurant Not Found" };
@@ -24,6 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function RestaurantPage({ params }: Props) {
+  await ensureExpandedDemoRestaurants();
   const { slug } = await params;
   const restaurant = await getRestaurantBySlug(slug);
   if (!restaurant) notFound();

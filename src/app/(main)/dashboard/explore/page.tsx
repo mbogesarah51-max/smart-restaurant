@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/app/actions/auth";
 import { searchRestaurants, type SearchParams } from "@/app/actions/restaurant";
+import { ensureExpandedDemoRestaurants } from "@/lib/expanded-demo-restaurants";
 import { ExploreRestaurants } from "@/components/restaurant/explore-restaurants";
 
 interface Props {
@@ -11,6 +12,7 @@ export default async function ExplorePage({ searchParams }: Props) {
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
 
+  await ensureExpandedDemoRestaurants();
   const params = await searchParams;
 
   const search: SearchParams = {
