@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/app/actions/auth";
+import { getDinerNotifications } from "@/app/actions/notifications";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 
 export default async function DashboardLayout({
@@ -13,5 +14,11 @@ export default async function DashboardLayout({
     redirect("/sign-in");
   }
 
-  return <DashboardShell user={user}>{children}</DashboardShell>;
+  const notifications = user.role === "CLIENT" ? await getDinerNotifications() : [];
+
+  return (
+    <DashboardShell user={user} notifications={notifications}>
+      {children}
+    </DashboardShell>
+  );
 }
