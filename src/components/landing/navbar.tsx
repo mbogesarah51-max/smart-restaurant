@@ -10,9 +10,11 @@ import { Menu, UtensilsCrossed, LayoutDashboard } from "lucide-react";
 
 const navLinks = [
   { label: "Explore", href: "/explore" },
-  { label: "Features", href: "#features" },
+  { label: "Featured", href: "#featured" },
+  { label: "AI Concierge", href: "#ai" },
   { label: "How It Works", href: "#how-it-works" },
   { label: "For Restaurants", href: "#for-restaurants" },
+  { label: "Contact", href: "#contact" },
 ];
 
 export function Navbar() {
@@ -39,34 +41,33 @@ export function Navbar() {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-white/75 backdrop-blur-2xl border-b border-black/[0.06] shadow-[0_1px_24px_rgba(26,20,17,0.07)]"
-          : "bg-transparent"
+          ? "bg-white/90 backdrop-blur-2xl border-b border-black/[0.06] shadow-[0_1px_24px_rgba(26,20,17,0.07)]"
+          : "bg-black/20 backdrop-blur-sm"
       }`}
     >
-      {/* Scroll progress bar */}
       <div
         className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-brand-orange via-amber-500 to-brand-orange origin-left transition-[width] duration-150 ease-out"
         style={{ width: `${progress}%`, opacity: scrolled ? 1 : 0 }}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="sheen w-9 h-9 rounded-xl bg-gradient-to-br from-brand-orange to-amber-500 flex items-center justify-center shadow-[0_4px_14px_-2px_rgba(249,115,22,0.4)] group-hover:shadow-[0_6px_18px_-2px_rgba(249,115,22,0.5)] group-hover:scale-105 transition-all duration-300">
+            <div className="sheen w-9 h-9 rounded-xl bg-gradient-to-br from-brand-orange to-amber-500 flex items-center justify-center shadow-[0_4px_14px_-2px_rgba(249,115,22,0.4)] group-hover:scale-105 transition-all duration-300">
               <UtensilsCrossed className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold font-heading text-brand-dark tracking-tight">
+            <span className={`text-xl font-bold font-heading tracking-tight ${scrolled ? "text-brand-dark" : "text-white"}`}>
               Chop<span className="text-brand-orange">Wise</span>
             </span>
           </Link>
 
-          {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden xl:flex items-center gap-0.5">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="relative px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 group"
+                className={`relative px-3 py-2 text-sm transition-colors duration-200 group ${
+                  scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/80 hover:text-white"
+                }`}
               >
                 {link.label}
                 <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-brand-orange group-hover:w-4/5 transition-all duration-300 rounded-full" />
@@ -74,86 +75,47 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
             {isLoaded && isSignedIn ? (
               <Link href="/dashboard">
-                <Button className="bg-gradient-to-r from-brand-orange to-amber-500 hover:from-brand-orange-hover hover:to-amber-600 text-white font-semibold px-6 rounded-xl shadow-md shadow-brand-orange/20 hover:shadow-brand-orange/30 transition-all duration-300 gap-2">
-                  <LayoutDashboard className="size-4" />
-                  Dashboard
+                <Button className="bg-gradient-to-r from-brand-orange to-amber-500 text-white font-semibold px-6 rounded-xl gap-2">
+                  <LayoutDashboard className="size-4" /> Dashboard
                 </Button>
               </Link>
             ) : (
               <>
                 <Link href="/sign-in">
-                  <Button
-                    variant="ghost"
-                    className="text-muted-foreground hover:text-foreground hover:bg-black/[0.04] rounded-xl"
-                  >
-                    Sign In
-                  </Button>
+                  <Button variant="ghost" className={scrolled ? "text-muted-foreground" : "text-white hover:bg-white/10 hover:text-white"}>Sign In</Button>
                 </Link>
                 <Link href="/sign-up">
-                  <Button className="bg-gradient-to-r from-brand-orange to-amber-500 hover:from-brand-orange-hover hover:to-amber-600 text-white font-semibold px-6 rounded-xl shadow-md shadow-brand-orange/20 hover:shadow-brand-orange/30 transition-all duration-300">
-                    Get Started
-                  </Button>
+                  <Button className="bg-gradient-to-r from-brand-orange to-amber-500 text-white font-semibold px-6 rounded-xl">Get Started</Button>
                 </Link>
               </>
             )}
           </div>
 
-          {/* Mobile Menu */}
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger className="lg:hidden inline-flex items-center justify-center rounded-xl text-sm font-medium transition-colors hover:bg-black/[0.04] h-10 w-10 text-foreground">
+            <SheetTrigger className={`lg:hidden inline-flex items-center justify-center rounded-xl h-10 w-10 ${scrolled ? "text-foreground" : "text-white"}`}>
               <Menu className="w-5 h-5" />
             </SheetTrigger>
-            <SheetContent
-              side="right"
-              className="w-80 bg-white/95 backdrop-blur-2xl border-black/[0.06]"
-            >
+            <SheetContent side="right" className="w-80 bg-white/95 backdrop-blur-2xl border-black/[0.06]">
               <div className="flex flex-col gap-2 mt-12">
                 <AnimatePresence>
-                  {navLinks.map((link, i) => (
-                    <motion.div
-                      key={link.href}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.08 }}
-                    >
-                      <a
-                        href={link.href}
-                        onClick={() => setOpen(false)}
-                        className="block px-4 py-3 text-lg text-muted-foreground hover:text-foreground hover:bg-black/[0.03] rounded-xl transition-all duration-200"
-                      >
+                  {navLinks.map((link, index) => (
+                    <motion.div key={link.href} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.06 }}>
+                      <a href={link.href} onClick={() => setOpen(false)} className="block px-4 py-3 text-lg text-muted-foreground hover:text-foreground hover:bg-black/[0.03] rounded-xl">
                         {link.label}
                       </a>
                     </motion.div>
                   ))}
                 </AnimatePresence>
-
                 <div className="flex flex-col gap-3 mt-8 px-4">
                   {isLoaded && isSignedIn ? (
-                    <Link href="/dashboard" onClick={() => setOpen(false)}>
-                      <Button className="w-full bg-gradient-to-r from-brand-orange to-amber-500 hover:from-brand-orange-hover hover:to-amber-600 text-white font-semibold rounded-xl h-12 shadow-md shadow-brand-orange/20 gap-2">
-                        <LayoutDashboard className="size-4" />
-                        Dashboard
-                      </Button>
-                    </Link>
+                    <Link href="/dashboard" onClick={() => setOpen(false)}><Button className="w-full bg-gradient-to-r from-brand-orange to-amber-500 text-white font-semibold rounded-xl h-12 gap-2"><LayoutDashboard className="size-4" />Dashboard</Button></Link>
                   ) : (
                     <>
-                      <Link href="/sign-in" onClick={() => setOpen(false)}>
-                        <Button
-                          variant="outline"
-                          className="w-full border-black/10 hover:bg-black/[0.03] rounded-xl h-12"
-                        >
-                          Sign In
-                        </Button>
-                      </Link>
-                      <Link href="/sign-up" onClick={() => setOpen(false)}>
-                        <Button className="w-full bg-gradient-to-r from-brand-orange to-amber-500 hover:from-brand-orange-hover hover:to-amber-600 text-white font-semibold rounded-xl h-12 shadow-md shadow-brand-orange/20">
-                          Get Started
-                        </Button>
-                      </Link>
+                      <Link href="/sign-in" onClick={() => setOpen(false)}><Button variant="outline" className="w-full rounded-xl h-12">Sign In</Button></Link>
+                      <Link href="/sign-up" onClick={() => setOpen(false)}><Button className="w-full bg-gradient-to-r from-brand-orange to-amber-500 text-white font-semibold rounded-xl h-12">Get Started</Button></Link>
                     </>
                   )}
                 </div>
