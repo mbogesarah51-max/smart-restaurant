@@ -1,14 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
   CalendarCheck,
@@ -38,13 +34,13 @@ const TABS: { value: Tab; label: string }[] = [
 ];
 
 const STATUS_BADGE: Record<string, { label: string; className: string }> = {
-  PENDING: { label: "Pending", className: "bg-gray-100 text-gray-700" },
-  AWAITING_RESPONSE: { label: "Awaiting Response", className: "bg-amber-100 text-amber-700" },
-  ACCEPTED: { label: "Accepted", className: "bg-blue-100 text-blue-700" },
+  PENDING: { label: "Pending", className: "bg-gray-100 text-gray-700 dark:bg-gray-500/15 dark:text-gray-300" },
+  AWAITING_RESPONSE: { label: "Awaiting Response", className: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300" },
+  ACCEPTED: { label: "Accepted", className: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300" },
   PAYMENT_PENDING: { label: "Payment Pending", className: "bg-brand-orange/10 text-brand-orange" },
-  CONFIRMED: { label: "Confirmed", className: "bg-emerald-100 text-emerald-700" },
-  CANCELLED: { label: "Cancelled", className: "bg-gray-100 text-gray-500" },
-  REJECTED: { label: "Rejected", className: "bg-red-100 text-red-700" },
+  CONFIRMED: { label: "Confirmed", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300" },
+  CANCELLED: { label: "Cancelled", className: "bg-gray-100 text-gray-500 dark:bg-gray-500/15 dark:text-gray-400" },
+  REJECTED: { label: "Rejected", className: "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300" },
 };
 
 type ReservationWithRestaurant = Reservation & {
@@ -52,45 +48,54 @@ type ReservationWithRestaurant = Reservation & {
 };
 
 export function MyReservations() {
-  const router = useRouter();
   const [tab, setTab] = useState<Tab>("pending");
   const [reservations, setReservations] = useState<ReservationWithRestaurant[]>([]);
   const [loading, setLoading] = useState(true);
+  const requestIdRef = useRef(0);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    const data = await getClientReservations({ status: tab });
-    setReservations(data as ReservationWithRestaurant[]);
-    setLoading(false);
+  const fetchData = useCallback(async (showLoader = true) => {
+    const requestId = ++requestIdRef.current;
+    if (showLoader) setLoading(true);
+
+    try {
+      const data = await getClientReservations({ status: tab });
+      if (requestId === requestIdRef.current) {
+        setReservations(data as ReservationWithRestaurant[]);
+      }
+    } finally {
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
+    }
   }, [tab]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData(true);
+  }, [fetchData]);
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-bold font-heading text-foreground">My Reservations</h1>
+        <h1 className="font-heading text-xl font-bold text-foreground">My Reservations</h1>
         <p className="text-sm text-muted-foreground">Track and manage your restaurant bookings</p>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-1 overflow-x-auto pb-1">
-        {TABS.map((t) => (
+        {TABS.map((item) => (
           <button
-            key={t.value}
-            onClick={() => setTab(t.value)}
-            className={`px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-              tab === t.value
+            key={item.value}
+            onClick={() => setTab(item.value)}
+            className={`whitespace-nowrap rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors ${
+              tab === item.value
                 ? "bg-brand-orange text-white"
                 : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
             }`}
           >
-            {t.label}
+            {item.label}
           </button>
         ))}
       </div>
 
-      {/* Content */}
       {loading ? (
         <div className="flex items-center justify-center py-16">
           <Loader2 className="size-6 animate-spin text-muted-foreground" />
@@ -99,16 +104,16 @@ export function MyReservations() {
         <Card className="border-border/50 shadow-sm">
           <CardContent className="py-16">
             <div className="flex flex-col items-center text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/50 mb-3">
+              <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/50">
                 <CalendarCheck className="size-6 text-muted-foreground/50" />
               </div>
-              <h3 className="text-sm font-medium text-foreground mb-1">
+              <h3 className="mb-1 text-sm font-medium text-foreground">
                 {tab === "pending" ? "No pending reservations" :
                  tab === "upcoming" ? "No upcoming reservations" :
                  tab === "past" ? "No past reservations" :
                  "No cancelled reservations"}
               </h3>
-              <p className="text-sm text-muted-foreground max-w-xs mb-4">
+              <p className="mb-4 max-w-xs text-sm text-muted-foreground">
                 {tab === "pending" || tab === "upcoming"
                   ? "Explore restaurants and make your first booking!"
                   : "Your reservation history will appear here."}
@@ -116,7 +121,7 @@ export function MyReservations() {
               {(tab === "pending" || tab === "upcoming") && (
                 <Link
                   href="/dashboard/explore"
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold bg-brand-orange hover:bg-brand-orange-hover text-white transition-colors"
+                  className="flex items-center gap-1.5 rounded-lg bg-brand-orange px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-orange-hover"
                 >
                   <Search className="size-4" />
                   Explore Restaurants
@@ -127,12 +132,11 @@ export function MyReservations() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {reservations.map((r) => (
+          {reservations.map((reservation) => (
             <ReservationCard
-              key={r.id}
-              reservation={r}
-              onCancel={fetchData}
-              onExpire={fetchData}
+              key={reservation.id}
+              reservation={reservation}
+              onRefresh={() => fetchData(false)}
             />
           ))}
         </div>
@@ -141,47 +145,68 @@ export function MyReservations() {
   );
 }
 
-// ─── Reservation Card ────────────────────────────────────────────────────────
-
-function ReservationCard({ reservation: r, onCancel, onExpire }: {
+function ReservationCard({
+  reservation,
+  onRefresh,
+}: {
   reservation: ReservationWithRestaurant;
-  onCancel: () => void;
-  onExpire: () => void;
+  onRefresh: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
 
-  const status = STATUS_BADGE[r.status] || STATUS_BADGE.PENDING;
-  const date = new Date(r.date);
-  const formattedDate = date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
-  const canCancel = ["AWAITING_RESPONSE", "ACCEPTED", "PAYMENT_PENDING", "PENDING"].includes(r.status);
-  const isAwaiting = r.status === "AWAITING_RESPONSE";
+  const status = STATUS_BADGE[reservation.status] || STATUS_BADGE.PENDING;
+  const date = new Date(reservation.date);
+  const formattedDate = date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+  const canCancel = ["AWAITING_RESPONSE", "ACCEPTED", "PAYMENT_PENDING", "PENDING"].includes(reservation.status);
+  const isAwaiting = reservation.status === "AWAITING_RESPONSE";
 
-  // Parse preferences
-  let prefs: { occasion?: string; notes?: string; preOrder?: { name: string; price: number; quantity: number }[]; estimatedTotal?: number } = {};
-  try { if (r.preferences) prefs = JSON.parse(r.preferences); } catch {}
+  let preferences: {
+    occasion?: string;
+    notes?: string;
+    preOrder?: { name: string; price: number; quantity: number }[];
+    estimatedTotal?: number;
+  } = {};
+
+  try {
+    if (reservation.preferences) preferences = JSON.parse(reservation.preferences);
+  } catch {
+    preferences = {};
+  }
 
   async function handleCancel() {
     setCancelling(true);
-    const result = await cancelReservation(r.id);
+    const result = await cancelReservation(reservation.id);
+
     if (result.success) {
       toast.success(result.message);
-      onCancel();
+      onRefresh();
     } else {
       toast.error(result.message);
     }
+
     setCancelling(false);
     setConfirmCancel(false);
   }
 
   return (
-    <Card className="border-border/50 shadow-sm overflow-hidden">
+    <Card className="overflow-hidden border-border/50 shadow-sm">
       <div className="flex gap-3 p-4">
-        {/* Restaurant image */}
-        <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-muted/30">
-          {r.restaurant.bannerImage ? (
-            <Image src={r.restaurant.bannerImage} alt={r.restaurant.name} fill className="object-cover" sizes="80px" />
+        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-muted/30">
+          {reservation.restaurant.bannerImage ? (
+            <Image
+              src={reservation.restaurant.bannerImage}
+              alt={reservation.restaurant.name}
+              fill
+              className="object-cover"
+              sizes="80px"
+            />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
               <UtensilsCrossed className="size-6 text-muted-foreground/30" />
@@ -189,51 +214,63 @@ function ReservationCard({ reservation: r, onCancel, onExpire }: {
           )}
         </div>
 
-        {/* Info */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <Link href={`/dashboard/restaurants/${r.restaurant.slug}`} className="text-sm font-semibold text-foreground hover:text-brand-orange transition-colors">
-                {r.restaurant.name}
+              <Link
+                href={`/dashboard/restaurants/${reservation.restaurant.slug}`}
+                className="text-sm font-semibold text-foreground transition-colors hover:text-brand-orange"
+              >
+                {reservation.restaurant.name}
               </Link>
-              <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground flex-wrap">
+              <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1"><CalendarCheck className="size-3" /> {formattedDate}</span>
-                <span className="flex items-center gap-1"><Clock className="size-3" /> {r.time}</span>
-                <span className="flex items-center gap-1"><Users className="size-3" /> {r.guestCount}</span>
+                <span className="flex items-center gap-1"><Clock className="size-3" /> {reservation.time}</span>
+                <span className="flex items-center gap-1"><Users className="size-3" /> {reservation.guestCount}</span>
               </div>
             </div>
-            <Badge variant="secondary" className={`border-0 text-[10px] shrink-0 ${status.className}`}>
+            <Badge variant="secondary" className={`shrink-0 border-0 text-[10px] ${status.className}`}>
               {status.label}
             </Badge>
           </div>
 
-          {/* Countdown for awaiting */}
-          {isAwaiting && r.responseDeadline && (
-            <div className="mt-2">
-              <CountdownTimer deadline={r.responseDeadline} onExpire={onExpire} />
+          {isAwaiting && reservation.responseDeadline && (
+            <div className="mt-2 rounded-lg bg-amber-50 px-3 py-2 dark:bg-amber-500/10">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <CountdownTimer
+                  deadline={reservation.responseDeadline}
+                  expiredLabel="Still pending"
+                />
+                <span className="text-[11px] text-amber-800 dark:text-amber-300">
+                  Your request stays pending until the restaurant responds or you cancel it.
+                </span>
+              </div>
             </div>
           )}
 
-          {/* Pay Now for PAYMENT_PENDING */}
-          {r.status === "PAYMENT_PENDING" && (
-            <div className="mt-2 flex items-center gap-3">
+          {reservation.status === "PAYMENT_PENDING" && (
+            <div className="mt-2 flex flex-wrap items-center gap-3">
               <Link
-                href={`/dashboard/reservations/${r.id}/pay`}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
+                href={`/dashboard/reservations/${reservation.id}/pay`}
+                className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-700"
               >
-                Pay Now — {formatPrice(r.bookingFee || BOOKING_FEE)}
+                Pay Now — {formatPrice(reservation.bookingFee || BOOKING_FEE)}
               </Link>
-              {r.paymentDeadline && (
-                <CountdownTimer deadline={r.paymentDeadline} onExpire={onExpire} />
+              {reservation.paymentDeadline && (
+                <CountdownTimer
+                  deadline={reservation.paymentDeadline}
+                  onExpire={onRefresh}
+                  invokeOnExpire
+                  expiredLabel="Payment window ended"
+                />
               )}
             </div>
           )}
 
-          {/* Expand / actions */}
-          <div className="flex items-center gap-2 mt-2">
+          <div className="mt-2 flex items-center gap-2">
             <button
               onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               {expanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
               {expanded ? "Less" : "Details"}
@@ -242,22 +279,25 @@ function ReservationCard({ reservation: r, onCancel, onExpire }: {
             {canCancel && !confirmCancel && (
               <button
                 onClick={() => setConfirmCancel(true)}
-                className="flex items-center gap-1 text-xs font-medium text-destructive hover:text-destructive/80 transition-colors ml-auto"
+                className="ml-auto flex items-center gap-1 text-xs font-medium text-destructive transition-colors hover:text-destructive/80"
               >
                 <X className="size-3" /> Cancel
               </button>
             )}
 
             {confirmCancel && (
-              <div className="flex items-center gap-1.5 ml-auto">
+              <div className="ml-auto flex items-center gap-1.5">
                 <button
                   onClick={handleCancel}
                   disabled={cancelling}
-                  className="px-2.5 py-1 rounded-md text-xs font-medium text-white bg-destructive hover:bg-destructive/90 transition-colors"
+                  className="rounded-md bg-destructive px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-destructive/90"
                 >
                   {cancelling ? <Loader2 className="size-3 animate-spin" /> : "Yes, cancel"}
                 </button>
-                <button onClick={() => setConfirmCancel(false)} className="px-2 py-1 rounded-md text-xs text-muted-foreground hover:bg-muted/80">
+                <button
+                  onClick={() => setConfirmCancel(false)}
+                  className="rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-muted/80"
+                >
                   No
                 </button>
               </div>
@@ -266,52 +306,54 @@ function ReservationCard({ reservation: r, onCancel, onExpire }: {
         </div>
       </div>
 
-      {/* Expanded details */}
       {expanded && (
-        <div className="px-4 pb-4 pt-0 border-t border-border/30 mt-0">
-          <div className="pt-3 space-y-2 text-sm">
+        <div className="mt-0 border-t border-border/30 px-4 pb-4 pt-0">
+          <div className="space-y-2 pt-3 text-sm">
             <div className="flex items-center gap-2 text-muted-foreground">
               <MapPin className="size-3.5" />
-              <span>{r.restaurant.address}, {r.restaurant.city}</span>
+              <span>{reservation.restaurant.address}, {reservation.restaurant.city}</span>
             </div>
 
-            {prefs.occasion && (
+            {preferences.occasion && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Occasion</span>
-                <span className="text-foreground">{prefs.occasion}</span>
+                <span className="text-foreground">{preferences.occasion}</span>
               </div>
             )}
 
-            {prefs.notes && (
+            {preferences.notes && (
               <div>
-                <span className="text-muted-foreground text-xs">Special requests:</span>
-                <p className="text-foreground text-xs mt-0.5">{prefs.notes}</p>
+                <span className="text-xs text-muted-foreground">Special requests:</span>
+                <p className="mt-0.5 text-xs text-foreground">{preferences.notes}</p>
               </div>
             )}
 
-            {prefs.preOrder && prefs.preOrder.length > 0 && (
-              <div className="pt-2 border-t border-border/30">
-                <p className="text-xs font-semibold text-foreground mb-1.5">Pre-selected meals</p>
-                {prefs.preOrder.map((item, i) => (
-                  <div key={i} className="flex justify-between text-xs">
+            {preferences.preOrder && preferences.preOrder.length > 0 && (
+              <div className="border-t border-border/30 pt-2">
+                <p className="mb-1.5 text-xs font-semibold text-foreground">Pre-selected meals</p>
+                {preferences.preOrder.map((item, index) => (
+                  <div key={`${item.name}-${index}`} className="flex justify-between text-xs">
                     <span className="text-muted-foreground">{item.quantity}x {item.name}</span>
                     <span className="text-foreground">{formatPrice(item.price * item.quantity)}</span>
                   </div>
                 ))}
-                {prefs.estimatedTotal && (
-                  <div className="flex justify-between text-xs font-bold pt-1 mt-1 border-t border-border/20">
+                {preferences.estimatedTotal && (
+                  <div className="mt-1 flex justify-between border-t border-border/20 pt-1 text-xs font-bold">
                     <span>Estimated total</span>
-                    <span className="text-brand-orange">{formatPrice(prefs.estimatedTotal)}</span>
+                    <span className="text-brand-orange">{formatPrice(preferences.estimatedTotal)}</span>
                   </div>
                 )}
               </div>
             )}
 
-            {r.status === "PAYMENT_PENDING" && (
+            {reservation.status === "PAYMENT_PENDING" && (
               <div className="pt-2">
-                <button className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold bg-brand-orange hover:bg-brand-orange-hover text-white transition-colors">
-                  Complete Payment — {formatPrice(r.bookingFee || BOOKING_FEE)}
-                </button>
+                <Link
+                  href={`/dashboard/reservations/${reservation.id}/pay`}
+                  className="block w-full rounded-lg bg-brand-orange px-4 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-brand-orange-hover"
+                >
+                  Complete Payment — {formatPrice(reservation.bookingFee || BOOKING_FEE)}
+                </Link>
               </div>
             )}
           </div>

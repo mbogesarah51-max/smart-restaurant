@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { LayoutDashboard, Menu, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const navLinks = [
   { label: "Explore", href: "/explore" },
@@ -43,7 +44,7 @@ export function Navbar() {
       transition={{ duration: 0.55, ease: "easeOut" }}
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "border-b border-black/[0.06] bg-white/95 shadow-[0_1px_24px_rgba(26,20,17,0.08)] backdrop-blur-2xl"
+          ? "border-b border-black/[0.06] bg-white/95 shadow-[0_1px_24px_rgba(26,20,17,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#171311]/95"
           : "bg-slate-950/90 backdrop-blur-xl"
       }`}
     >
@@ -58,7 +59,7 @@ export function Navbar() {
             <div className="sheen flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-orange to-amber-500 shadow-[0_4px_14px_-2px_rgba(249,115,22,0.4)] transition-all duration-300 group-hover:scale-105">
               <UtensilsCrossed className="h-5 w-5 text-white" />
             </div>
-            <span className={`font-heading text-xl font-bold tracking-tight ${scrolled ? "text-brand-dark" : "text-white"}`}>
+            <span className={`font-heading text-xl font-bold tracking-tight ${scrolled ? "text-brand-dark dark:text-white" : "text-white"}`}>
               Chop<span className="text-brand-orange">Wise</span>
             </span>
           </Link>
@@ -73,8 +74,8 @@ export function Navbar() {
                   className={`group relative whitespace-nowrap rounded-lg px-2.5 py-2 text-xs font-semibold transition-colors duration-200 xl:px-3 xl:text-sm ${
                     scrolled
                       ? active
-                        ? "bg-orange-50 text-orange-700"
-                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
+                        ? "bg-orange-50 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
                       : active
                         ? "bg-white/10 text-white"
                         : "text-white/80 hover:bg-white/10 hover:text-white"
@@ -87,7 +88,11 @@ export function Navbar() {
             })}
           </div>
 
-          <div className="ml-auto hidden shrink-0 items-center gap-2 2xl:flex">
+          <div className={`hidden shrink-0 lg:flex ${scrolled ? "text-slate-700 dark:text-slate-200" : "text-white"}`}>
+            <ThemeToggle compact />
+          </div>
+
+          <div className="hidden shrink-0 items-center gap-2 2xl:flex">
             {isLoaded && isSignedIn ? (
               <Link href="/dashboard">
                 <Button className="gap-2 rounded-xl bg-gradient-to-r from-brand-orange to-amber-500 px-5 font-semibold text-white">
@@ -97,7 +102,7 @@ export function Navbar() {
             ) : (
               <>
                 <Link href="/sign-in">
-                  <Button variant="ghost" className={scrolled ? "text-slate-600 hover:text-slate-950" : "text-white hover:bg-white/10 hover:text-white"}>Sign In</Button>
+                  <Button variant="ghost" className={scrolled ? "text-slate-600 hover:text-slate-950 dark:text-slate-300 dark:hover:text-white" : "text-white hover:bg-white/10 hover:text-white"}>Sign In</Button>
                 </Link>
                 <Link href="/sign-up">
                   <Button className="rounded-xl bg-gradient-to-r from-brand-orange to-amber-500 px-5 font-semibold text-white">Get Started</Button>
@@ -110,18 +115,21 @@ export function Navbar() {
             <SheetTrigger className={`ml-auto inline-flex h-10 w-10 items-center justify-center rounded-xl lg:hidden ${scrolled ? "text-foreground" : "text-white"}`} aria-label="Open navigation menu">
               <Menu className="h-5 w-5" />
             </SheetTrigger>
-            <SheetContent side="right" className="w-80 border-black/[0.06] bg-white/95 backdrop-blur-2xl">
+            <SheetContent side="right" className="w-80 border-black/[0.06] bg-white/95 backdrop-blur-2xl dark:border-white/10 dark:bg-[#171311]/95">
               <div className="mt-12 flex flex-col gap-2">
                 <AnimatePresence>
                   {navLinks.map((link, index) => (
                     <motion.div key={link.href} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.06 }}>
-                      <Link href={link.href} onClick={() => setOpen(false)} className={`block rounded-xl px-4 py-3 text-lg ${pathname === link.href ? "bg-orange-50 font-bold text-orange-700" : "text-muted-foreground hover:bg-black/[0.03] hover:text-foreground"}`}>
+                      <Link href={link.href} onClick={() => setOpen(false)} className={`block rounded-xl px-4 py-3 text-lg ${pathname === link.href ? "bg-orange-50 font-bold text-orange-700 dark:bg-orange-500/15 dark:text-orange-300" : "text-muted-foreground hover:bg-black/[0.03] hover:text-foreground dark:hover:bg-white/5"}`}>
                         {link.label}
                       </Link>
                     </motion.div>
                   ))}
                 </AnimatePresence>
-                <div className="mt-8 flex flex-col gap-3 px-4">
+                <div className="mt-5 border-t border-border/50 px-4 pt-5">
+                  <ThemeToggle />
+                </div>
+                <div className="mt-5 flex flex-col gap-3 px-4">
                   {isLoaded && isSignedIn ? (
                     <Link href="/dashboard" onClick={() => setOpen(false)}><Button className="h-12 w-full gap-2 rounded-xl bg-gradient-to-r from-brand-orange to-amber-500 font-semibold text-white"><LayoutDashboard className="size-4" />Dashboard</Button></Link>
                   ) : (

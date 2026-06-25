@@ -3,7 +3,9 @@ import { Inter, Poppins } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
 import { UserProvider } from "@/context/user-context";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
+import "./dark-mode.css";
 import "./reservation-fee.css";
 
 const inter = Inter({
@@ -47,22 +49,21 @@ export default function RootLayout({
       appearance={{
         variables: {
           colorPrimary: "#F97316",
-          colorBackground: "#FFFCF9",
-          colorInputBackground: "#FFFFFF",
-          colorInputText: "#1C1917",
-          colorText: "#1C1917",
         },
       }}
     >
       <html
         lang="en"
+        suppressHydrationWarning
         className={`${inter.variable} ${poppins.variable} h-full antialiased`}
       >
         <body className="min-h-full flex flex-col bg-background text-foreground">
-          <UserProvider>
-            {children}
-            <Toaster richColors position="top-right" />
-          </UserProvider>
+          <ThemeProvider>
+            <UserProvider>
+              {children}
+              <Toaster richColors position="top-right" />
+            </UserProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

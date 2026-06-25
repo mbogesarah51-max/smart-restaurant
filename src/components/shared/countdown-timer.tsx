@@ -1,46 +1,84 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Clock } from "lucide-react";
 
 interface CountdownTimerProps {
   deadline: Date | string;
   onExpire?: () => void;
   className?: string;
-  /** Text shown once the countdown reaches zero. Defaults to "Expired". */
   expiredLabel?: string;
+  /**
+   * Soft response timers should remain pending after reaching zero.
+   * Set this to true only for hard deadlines such as payment windows.
+   */
+  invokeOnExpire?: boolean;
 }
 
-export function CountdownTimer({ deadline, onExpire, className = "", expiredLabel = "Expired" }: CountdownTimerProps) {
+export function CountdownTimer({
+  deadline,
+  onExpire,
+  className = "",
+  expiredLabel,
+  invokeOnExpire = false,
+}: CountdownTimerProps) {
   const [remaining, setRemaining] = useState(() => getRemaining(deadline));
+  const onExpireRef = useRef(onExpire);
+  const expiredCalledRef = useRef(false);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const r = getRemaining(deadline);
-      setRemaining(r);
-      if (r.total <= 0) {
-        clearInterval(interval);
-        onExpire?.();
+    onExpireRef.current = onExpire;
+  }, [onExpire]);
+
+  useEffect(() => {
+    expiredCalledRef.current = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let cancelled = false;
+
+    function update() {
+      if (cancelled) return;
+
+      const next = getRemaining(deadline);
+      setRemaining(next);
+
+      if (next.total <= 0) {
+        if (invokeOnExpire && !expiredCalledRef.current) {
+          expiredCalledRef.current = true;
+          onExpireRef.current?.();
+        }
+        return;
       }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [deadline, onExpire]);
+
+      const delay = Math.max(80, Math.min(1000, (next.total % 1000) + 20));
+      timer = setTimeout(update, delay);
+    }
+
+    update();
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [deadline, invokeOnExpire]);
 
   if (remaining.total <= 0) {
-    return <span className={`text-muted-foreground font-medium text-sm ${className}`}>{expiredLabel}</span>;
+    return (
+      <span className={`inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground ${className}`}>
+        <Clock className="size-3.5" />
+        {expiredLabel ?? (invokeOnExpire ? "Expired" : "Still pending")}
+      </span>
+    );
   }
 
-  const isUrgent = remaining.total < 120000; // under 2 min
-  const isCritical = remaining.total < 60000; // under 1 min
+  const urgent = remaining.total < 120000;
 
   return (
-    <span className={`inline-flex items-center gap-1.5 text-sm font-mono font-medium tabular-nums ${
-      isCritical
-        ? "text-destructive animate-pulse"
-        : isUrgent
-          ? "text-destructive"
-          : "text-amber-600"
-    } ${className}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 font-mono text-sm font-medium tabular-nums ${
+        urgent ? "text-destructive" : "text-amber-600 dark:text-amber-400"
+      } ${className}`}
+      aria-live="off"
+    >
       <Clock className="size-3.5" />
       {String(remaining.minutes).padStart(2, "0")}:{String(remaining.seconds).padStart(2, "0")}
     </span>
@@ -50,9 +88,10 @@ export function CountdownTimer({ deadline, onExpire, className = "", expiredLabe
 function getRemaining(deadline: Date | string) {
   const end = new Date(deadline).getTime();
   const total = Math.max(0, end - Date.now());
+
   return {
     total,
-    minutes: Math.floor((total / 1000 / 60) % 60),
+    minutes: Math.floor(total / 1000 / 60),
     seconds: Math.floor((total / 1000) % 60),
   };
 }

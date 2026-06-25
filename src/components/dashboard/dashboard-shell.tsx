@@ -1,6 +1,7 @@
 "use client";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { DashboardSidebar } from "./dashboard-sidebar";
 import { DashboardTopbar } from "./dashboard-topbar";
 import type { SafeUser } from "@/types";
@@ -17,7 +18,7 @@ export function DashboardShell({
 }) {
   return (
     <TooltipProvider>
-      <div className="flex h-screen overflow-hidden bg-gradient-to-br from-brand-surface via-background to-brand-sand/30">
+      <div className="flex h-screen overflow-hidden bg-gradient-to-br from-brand-surface via-background to-brand-sand/30 dark:from-[#15110f] dark:via-[#181310] dark:to-[#211914]">
         <DashboardSidebar user={user} />
         <div className="flex flex-1 flex-col overflow-hidden">
           <DashboardTopbar user={user} notifications={notifications} />
@@ -26,6 +27,9 @@ export function DashboardShell({
               {children}
             </div>
           </main>
+        </div>
+        <div className="fixed bottom-5 right-5 z-50 rounded-full border border-border/70 bg-background/90 p-1 shadow-xl backdrop-blur-xl">
+          <ThemeToggle compact />
         </div>
       </div>
     </TooltipProvider>
