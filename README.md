@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ChopWise
 
-## Getting Started
+ChopWise is a Cameroon-focused restaurant discovery, AI recommendation and reservation platform built with Next.js, React, TypeScript, Prisma, PostgreSQL, Clerk, Cloudinary, OpenAI and Twilio WhatsApp.
 
-First, run the development server:
+## Main capabilities
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Restaurant discovery by city, food, budget and amenities
+- Realistic food-rich restaurant profiles and menu prices in FCFA
+- AI restaurant concierge using approved database records
+- Diner and restaurant-owner authentication flows
+- Restaurant onboarding, menu management and approval workflow
+- Reservation creation, owner response, payment state and cancellation workflow
+- WhatsApp notification service with Cameroon `+237` phone-number normalization
+- Admin dashboard for restaurant and user management
+- Public backend health endpoint at `/api/health`
+
+## Public pages
+
+- `/` — homepage
+- `/explore` — restaurant directory
+- `/features` — product features
+- `/ai-concierge` — AI recommendation explanation and entry point
+- `/how-it-works` — diner and reservation workflow
+- `/for-restaurants` — restaurant-owner onboarding page
+- `/contact` — contact page
+- `/api/health` — database and catalogue status
+
+## Presentation catalogue
+
+When fewer than eight approved restaurants exist and `ENABLE_DEMO_DATA` is not set to `false`, ChopWise creates a realistic demonstration catalogue for:
+
+- Douala
+- Yaoundé
+- Limbe
+- Buea
+
+The catalogue contains affordable, mid-range, premium and luxury examples with food images, locations, menus, FCFA prices and opening hours. These records are presentation data and must not be described as independently verified real-world businesses.
+
+Disable automatic demo records in production with:
+
+```env
+ENABLE_DEMO_DATA=false
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env` file with the following values:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+# Database
+DATABASE_URL=
 
-## Learn More
+# Clerk authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
 
-To learn more about Next.js, take a look at the following resources:
+# Cloudinary images
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# OpenAI recommendations
+OPENAI_API_KEY=
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_CHOPWISE_PHONE=+2376XXXXXXXX
+CRON_SECRET=
+ENABLE_DEMO_DATA=true
 
-## Deploy on Vercel
+# Twilio WhatsApp
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Local setup
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm install
+npx prisma generate
+npm run dev
+```
+
+Open `http://localhost:3000`.
+
+## Validation
+
+```bash
+npx prisma generate
+npx tsc --noEmit
+npm run lint
+npm run build
+```
+
+## Currency
+
+Customer-facing prices are displayed as **FCFA**. Payment integrations continue to use **XAF**, the ISO code for the Central African CFA franc.
+
+## External-service status
+
+The application backend and database workflows are implemented. The following services still require valid deployment credentials to work in a live environment:
+
+- Clerk authentication
+- Neon/PostgreSQL database
+- Cloudinary uploads
+- OpenAI recommendations
+- Twilio WhatsApp notifications
+- Real payment provider such as NotchPay, CinetPay or MTN MoMo
+
+The current payment provider remains simulated until real provider keys and webhook handling are configured.

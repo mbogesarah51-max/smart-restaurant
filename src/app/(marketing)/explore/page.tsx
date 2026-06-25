@@ -1,15 +1,15 @@
 import { Navbar } from "@/components/landing/navbar";
-import { Footer } from "@/components/landing/sections";
+import { FoodieFooter } from "@/components/landing/foodie-footer";
 import { searchRestaurants, type SearchParams } from "@/app/actions/restaurant";
-import { ExploreRestaurants } from "@/components/restaurant/explore-restaurants";
+import { RealisticExplore } from "@/components/restaurant/realistic-explore";
 
 interface Props {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export const metadata = {
-  title: "Explore Restaurants | ChopWise",
-  description: "Discover the best restaurants in Cameroon. Browse by location, price range, and amenities.",
+  title: "Explore Restaurants in Cameroon | ChopWise",
+  description: "Discover affordable, premium and luxury restaurant experiences in Douala, Yaoundé, Limbe and Buea.",
 };
 
 export default async function PublicExplorePage({ searchParams }: Props) {
@@ -28,17 +28,12 @@ export default async function PublicExplorePage({ searchParams }: Props) {
   const result = await searchRestaurants(search);
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-[#fffaf5]">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
-        <ExploreRestaurants
-          initialData={result}
-          initialParams={search}
-          basePath="/explore"
-          detailBasePath="/restaurants"
-        />
+      <div className="mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 lg:px-8">
+        <RealisticExplore initialData={result} initialParams={search} />
       </div>
-      <Footer />
+      <FoodieFooter />
     </main>
   );
 }

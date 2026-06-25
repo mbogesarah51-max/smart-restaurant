@@ -1,29 +1,30 @@
 import { Navbar } from "@/components/landing/navbar";
+import { FoodieHero } from "@/components/landing/foodie-hero";
+import { AIProductDemo, FeaturedFoodSection, LocalTrustBar } from "@/components/landing/foodie-discovery";
 import {
-  HeroSection,
-  SocialProofSection,
-  FeaturesSection,
-  HowItWorksSection,
-  AIShowcaseSection,
-  ForRestaurantsSection,
-  TestimonialsSection,
-  CTASection,
-  Footer,
-} from "@/components/landing/sections";
+  CompactHowItWorks,
+  CoreFeatures,
+  HonestProofSection,
+  RestaurantOwnerSection,
+  WhatsAppFlow,
+} from "@/components/landing/foodie-operations";
+import { FoodieCTA, FoodieFooter } from "@/components/landing/foodie-footer";
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-background overflow-x-hidden">
+    <main className="min-h-screen overflow-x-hidden bg-background">
       <Navbar />
-      <HeroSection />
-      <SocialProofSection />
-      <FeaturesSection />
-      <HowItWorksSection />
-      <AIShowcaseSection />
-      <ForRestaurantsSection />
-      <TestimonialsSection />
-      <CTASection />
-      <Footer />
+      <FoodieHero />
+      <LocalTrustBar />
+      <FeaturedFoodSection />
+      <AIProductDemo />
+      <CoreFeatures />
+      <CompactHowItWorks />
+      <WhatsAppFlow />
+      <RestaurantOwnerSection />
+      <HonestProofSection />
+      <FoodieCTA />
+      <FoodieFooter />
     </main>
   );
 }
