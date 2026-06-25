@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
 import { UserProvider } from "@/context/user-context";
 import "./globals.css";
+import "./reservation-fee.css";
 
 const inter = Inter({
   variable: "--font-sans",
