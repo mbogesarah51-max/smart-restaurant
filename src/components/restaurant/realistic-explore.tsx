@@ -15,6 +15,8 @@ const priceOptions = [
   { value: "LUXURY", label: "Classy & luxury", icon: Crown },
 ];
 
+type SortOption = "newest" | "price_asc" | "price_desc";
+
 interface Props {
   initialData: SearchResult;
   initialParams: SearchParams;
@@ -26,7 +28,7 @@ export function RealisticExplore({ initialData, initialParams }: Props) {
   const [query, setQuery] = useState(initialParams.query || "");
   const [city, setCity] = useState(initialParams.city || "");
   const [price, setPrice] = useState(initialParams.priceRange?.[0] || "");
-  const [sort, setSort] = useState(initialParams.sort || "newest");
+  const [sort, setSort] = useState<SortOption>(initialParams.sort || "newest");
 
   function navigate(page = 1) {
     const params = new URLSearchParams();
@@ -69,12 +71,8 @@ export function RealisticExplore({ initialData, initialParams }: Props) {
         <div className="grid gap-8 lg:grid-cols-[1fr_0.72fr] lg:items-end">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-400">Cameroon restaurant directory</p>
-            <h1 className="mt-3 max-w-3xl font-heading text-4xl font-black tracking-tight sm:text-5xl">
-              From neighbourhood chop spots to classy fine dining.
-            </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300">
-              Browse realistic demonstration listings from Douala, Yaoundé, Limbe and Buea. Each listing includes a location, food photographs, menu prices in FCFA and reservation details.
-            </p>
+            <h1 className="mt-3 max-w-3xl font-heading text-4xl font-black tracking-tight sm:text-5xl">From neighbourhood chop spots to classy fine dining.</h1>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300">Browse realistic demonstration listings from Douala, Yaoundé, Limbe and Buea. Each listing includes a location, food photographs, menu prices in FCFA and reservation details.</p>
           </div>
           <div className="rounded-3xl bg-white/5 p-5 ring-1 ring-white/10">
             <p className="text-sm font-bold">What can you find here?</p>
@@ -103,14 +101,12 @@ export function RealisticExplore({ initialData, initialParams }: Props) {
           <select value={price} onChange={(event) => choosePrice(event.target.value)} className="h-12 rounded-xl bg-slate-50 px-3 text-sm font-semibold outline-none ring-1 ring-slate-100">
             {priceOptions.map((item) => <option key={item.value || "all"} value={item.value}>{item.label}</option>)}
           </select>
-          <select value={sort} onChange={(event) => setSort(event.target.value as SearchParams["sort"])} className="h-12 rounded-xl bg-slate-50 px-3 text-sm font-semibold outline-none ring-1 ring-slate-100">
+          <select value={sort} onChange={(event) => setSort(event.target.value as SortOption)} className="h-12 rounded-xl bg-slate-50 px-3 text-sm font-semibold outline-none ring-1 ring-slate-100">
             <option value="newest">Recently added</option>
             <option value="price_asc">Budget first</option>
             <option value="price_desc">Luxury first</option>
           </select>
-          <button type="submit" className="h-12 rounded-xl bg-gradient-to-r from-orange-600 to-amber-500 px-6 text-sm font-black text-white shadow-lg disabled:opacity-60" disabled={pending}>
-            {pending ? "Loading..." : "Apply"}
-          </button>
+          <button type="submit" className="h-12 rounded-xl bg-gradient-to-r from-orange-600 to-amber-500 px-6 text-sm font-black text-white shadow-lg disabled:opacity-60" disabled={pending}>{pending ? "Loading..." : "Apply"}</button>
         </div>
       </form>
 
@@ -123,12 +119,7 @@ export function RealisticExplore({ initialData, initialParams }: Props) {
       </div>
 
       <div className="mt-8 flex items-end justify-between gap-5">
-        <div>
-          <p className="text-sm font-bold uppercase tracking-[0.16em] text-orange-600">Available listings</p>
-          <h2 className="mt-2 font-heading text-3xl font-black text-slate-950">
-            {city ? `Restaurants in ${city}` : "Restaurants across Cameroon"}
-          </h2>
-        </div>
+        <div><p className="text-sm font-bold uppercase tracking-[0.16em] text-orange-600">Available listings</p><h2 className="mt-2 font-heading text-3xl font-black text-slate-950">{city ? `Restaurants in ${city}` : "Restaurants across Cameroon"}</h2></div>
         <p className="text-sm font-semibold text-slate-500">{initialData.total} restaurant{initialData.total === 1 ? "" : "s"}</p>
       </div>
 
@@ -153,9 +144,7 @@ export function RealisticExplore({ initialData, initialParams }: Props) {
         </div>
       )}
 
-      <p className="mt-10 rounded-2xl bg-amber-50 px-5 py-4 text-xs leading-6 text-amber-900 ring-1 ring-amber-100">
-        Presentation catalogue: these are realistic demonstration listings created for the ChopWise project. They illustrate how verified restaurants will appear after onboarding; they should not be presented as independently verified real-world businesses.
-      </p>
+      <p className="mt-10 rounded-2xl bg-amber-50 px-5 py-4 text-xs leading-6 text-amber-900 ring-1 ring-amber-100">Presentation catalogue: these are realistic demonstration listings created for the ChopWise project. They illustrate how verified restaurants will appear after onboarding; they should not be presented as independently verified real-world businesses.</p>
     </div>
   );
 }
