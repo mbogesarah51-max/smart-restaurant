@@ -2,8 +2,9 @@
 
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import { ensureDemoRestaurants } from "@/lib/demo-restaurants";
 import type { ActionResponse, RestaurantWithDetails } from "@/types";
-import type { Restaurant } from "@/generated/prisma/client";
+import type { MenuCategory, Restaurant } from "@/generated/prisma/client";
 
 function generateSlug(name: string): string {
   return name
@@ -48,12 +49,13 @@ export async function getRestaurantByOwnerId(): Promise<RestaurantWithDetails | 
 
   if (!restaurant) return null;
 
-  // Strip passwordHash from owner
   const { passwordHash: _, ...safeOwner } = restaurant.owner;
   return { ...restaurant, owner: safeOwner } as RestaurantWithDetails;
 }
 
 export async function getRestaurantBySlug(slug: string): Promise<RestaurantWithDetails | null> {
+  await ensureDemoRestaurants();
+
   const restaurant = await prisma.restaurant.findUnique({
     where: { slug },
     include: {
@@ -101,11 +103,9 @@ export async function createRestaurant(
   if (!user) return { success: false, message: "User not found" };
   if (user.role !== "RESTAURANT_OWNER") return { success: false, message: "Not authorized" };
 
-  // Check if owner already has a restaurant
   const existing = await prisma.restaurant.findFirst({ where: { ownerId: user.id } });
   if (existing) return { success: false, message: "You already have a restaurant registered" };
 
-  // Validate required fields
   if (!input.name || input.name.trim().length < 2) {
     return { success: false, message: "Restaurant name is required", errors: { name: ["Name must be at least 2 characters"] } };
   }
@@ -145,7 +145,6 @@ export async function createRestaurant(
         },
       });
 
-      // Create availability slots
       if (input.availability && input.availability.length > 0) {
         await tx.availabilitySlot.createMany({
           data: input.availability.map((slot) => ({
@@ -215,7 +214,6 @@ export async function updateRestaurant(
         data: updateData,
       });
 
-      // Update availability if provided
       if (input.availability) {
         await tx.availabilitySlot.deleteMany({ where: { restaurantId } });
         if (input.availability.length > 0) {
@@ -241,8 +239,6 @@ export async function updateRestaurant(
   }
 }
 
-// ─── Search / Discovery ──────────────────────────────────────────────────────
-
 export interface SearchParams {
   query?: string;
   priceRange?: string[];
@@ -253,14 +249,27 @@ export interface SearchParams {
   limit?: number;
 }
 
+export interface SearchMenuItem {
+  id: string;
+  name: string;
+  price: number;
+  image: string | null;
+  category: MenuCategory;
+}
+
 export interface SearchResult {
-  restaurants: (Restaurant & { menuItems: { id: string }[]; availabilitySlots: { dayOfWeek: number; openTime: string; closeTime: string; isActive: boolean }[] })[];
+  restaurants: (Restaurant & {
+    menuItems: SearchMenuItem[];
+    availabilitySlots: { dayOfWeek: number; openTime: string; closeTime: string; isActive: boolean }[];
+  })[];
   total: number;
   page: number;
   totalPages: number;
 }
 
 export async function searchRestaurants(params: SearchParams): Promise<SearchResult> {
+  await ensureDemoRestaurants();
+
   const {
     query,
     priceRange,
@@ -276,30 +285,27 @@ export async function searchRestaurants(params: SearchParams): Promise<SearchRes
     isActive: true,
   };
 
-  // Text search on name and description
   if (query && query.trim()) {
     where.OR = [
       { name: { contains: query.trim(), mode: "insensitive" } },
       { description: { contains: query.trim(), mode: "insensitive" } },
+      { city: { contains: query.trim(), mode: "insensitive" } },
+      { menuItems: { some: { name: { contains: query.trim(), mode: "insensitive" }, isAvailable: true } } },
     ];
   }
 
-  // Price range filter (any of selected)
   if (priceRange && priceRange.length > 0) {
     where.priceRange = { in: priceRange };
   }
 
-  // City filter
   if (city && city.trim()) {
     where.city = city.trim();
   }
 
-  // Amenities filter (must have ALL selected)
   if (amenities && amenities.length > 0) {
     where.amenities = { hasEvery: amenities };
   }
 
-  // Sort
   let orderBy: Record<string, string>;
   switch (sort) {
     case "price_asc":
@@ -321,7 +327,12 @@ export async function searchRestaurants(params: SearchParams): Promise<SearchRes
       skip,
       take: limit,
       include: {
-        menuItems: { select: { id: true }, where: { isAvailable: true } },
+        menuItems: {
+          select: { id: true, name: true, price: true, image: true, category: true },
+          where: { isAvailable: true },
+          orderBy: { price: "asc" },
+          take: 4,
+        },
         availabilitySlots: {
           where: { isActive: true },
           select: { dayOfWeek: true, openTime: true, closeTime: true, isActive: true },
