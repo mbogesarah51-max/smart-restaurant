@@ -8,13 +8,19 @@ interface CountdownTimerProps {
   onExpire?: () => void;
   className?: string;
   expiredLabel?: string;
+  /**
+   * Soft response timers should remain pending after reaching zero.
+   * Set this to true only for hard deadlines such as payment windows.
+   */
+  invokeOnExpire?: boolean;
 }
 
 export function CountdownTimer({
   deadline,
   onExpire,
   className = "",
-  expiredLabel = "Expired",
+  expiredLabel,
+  invokeOnExpire = false,
 }: CountdownTimerProps) {
   const [remaining, setRemaining] = useState(() => getRemaining(deadline));
   const onExpireRef = useRef(onExpire);
@@ -36,7 +42,7 @@ export function CountdownTimer({
       setRemaining(next);
 
       if (next.total <= 0) {
-        if (!expiredCalledRef.current) {
+        if (invokeOnExpire && !expiredCalledRef.current) {
           expiredCalledRef.current = true;
           onExpireRef.current?.();
         }
@@ -53,13 +59,13 @@ export function CountdownTimer({
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [deadline]);
+  }, [deadline, invokeOnExpire]);
 
   if (remaining.total <= 0) {
     return (
       <span className={`inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground ${className}`}>
         <Clock className="size-3.5" />
-        {expiredLabel}
+        {expiredLabel ?? (invokeOnExpire ? "Expired" : "Still pending")}
       </span>
     );
   }
