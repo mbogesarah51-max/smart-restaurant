@@ -146,7 +146,7 @@ export function MyReservations() {
 }
 
 function ReservationCard({
-  reservation: reservation,
+  reservation,
   onRefresh,
 }: {
   reservation: ReservationWithRestaurant;
@@ -260,6 +260,7 @@ function ReservationCard({
                 <CountdownTimer
                   deadline={reservation.paymentDeadline}
                   onExpire={onRefresh}
+                  invokeOnExpire
                   expiredLabel="Payment window ended"
                 />
               )}
