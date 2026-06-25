@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -42,9 +42,12 @@ export function PaymentCheckout({ reservation, userPhone, userEmail }: Props) {
   const [phone, setPhone] = useState(userPhone);
 
   const date = new Date(reservation.date);
-  const formattedDate = date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  const formattedDate = date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
 
-  // Check if already expired on mount
   useEffect(() => {
     if (reservation.paymentDeadline && new Date() > new Date(reservation.paymentDeadline)) {
       setExpired(true);
@@ -56,7 +59,6 @@ export function PaymentCheckout({ reservation, userPhone, userEmail }: Props) {
     setProcessing(true);
 
     try {
-      // Step 1: Initialize payment (get reference)
       const initRes = await fetch("/api/payments/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -70,10 +72,8 @@ export function PaymentCheckout({ reservation, userPhone, userEmail }: Props) {
         return;
       }
 
-      // Step 2: Simulate processing delay
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Step 3: Confirm payment
       const confirmRes = await fetch("/api/payments/confirm-simulated", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -105,48 +105,47 @@ export function PaymentCheckout({ reservation, userPhone, userEmail }: Props) {
   ];
 
   return (
-    <div className="max-w-lg mx-auto space-y-6">
-      {/* Dev mode banner */}
+    <div className="mx-auto max-w-lg space-y-6">
       {IS_PAYMENT_SIMULATED && (
-        <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200">
-          <AlertTriangle className="size-5 text-amber-600 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-500/25 dark:bg-amber-500/10">
+          <AlertTriangle className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-400" />
           <div>
-            <p className="text-sm font-semibold text-amber-800">Development Mode</p>
-            <p className="text-xs text-amber-700">No real payment will be charged. This is a simulated payment for testing.</p>
+            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Development Mode</p>
+            <p className="text-xs text-amber-700 dark:text-amber-300/80">No real payment will be charged. This is a simulated payment for testing.</p>
           </div>
         </div>
       )}
 
-      {/* Back */}
       <div className="flex items-center gap-2">
-        <Link href="/dashboard/reservations" className="flex items-center justify-center size-8 rounded-lg hover:bg-muted/80 transition-colors">
+        <Link href="/dashboard/reservations" className="flex size-8 items-center justify-center rounded-lg transition-colors hover:bg-muted/80">
           <ArrowLeft className="size-4" />
         </Link>
-        <h1 className="text-lg font-bold font-heading text-foreground">Complete Payment</h1>
+        <h1 className="font-heading text-lg font-bold text-foreground">Complete Payment</h1>
       </div>
 
-      {/* Payment deadline countdown */}
       {reservation.paymentDeadline && !expired && (
-        <div className="flex items-center justify-between px-4 py-2.5 rounded-lg bg-muted/50 border border-border/40">
+        <div className="flex items-center justify-between rounded-lg border border-border/40 bg-muted/50 px-4 py-2.5">
           <span className="text-xs text-muted-foreground">Time remaining to pay</span>
           <CountdownTimer
             deadline={reservation.paymentDeadline}
             onExpire={() => setExpired(true)}
+            invokeOnExpire
+            expiredLabel="Payment window ended"
           />
         </div>
       )}
 
       {expired && (
         <Card className="border-destructive/30 bg-destructive/5">
-          <CardContent className="pt-6 text-center space-y-3">
-            <Clock className="size-8 text-destructive mx-auto" />
+          <CardContent className="space-y-3 pt-6 text-center">
+            <Clock className="mx-auto size-8 text-destructive" />
             <h3 className="font-semibold text-destructive">Payment Window Expired</h3>
             <p className="text-sm text-muted-foreground">Your reservation has been cancelled. You can try booking again.</p>
             <Link
-              href={`/dashboard/restaurants/${reservation.restaurant.id}`}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-brand-orange hover:bg-brand-orange-hover text-white transition-colors"
+              href="/dashboard/explore"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-brand-orange px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-orange-hover"
             >
-              Book Again
+              Explore Restaurants
             </Link>
           </CardContent>
         </Card>
@@ -154,28 +153,27 @@ export function PaymentCheckout({ reservation, userPhone, userEmail }: Props) {
 
       {!expired && (
         <>
-          {/* Order summary */}
           <Card className="border-border/50 shadow-sm">
             <CardContent className="pt-5">
-              <h3 className="text-sm font-semibold text-foreground mb-3">Order Summary</h3>
+              <h3 className="mb-3 text-sm font-semibold text-foreground">Order Summary</h3>
               <div className="space-y-2.5 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Restaurant</span>
                   <span className="font-medium text-foreground">{reservation.restaurant.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground flex items-center gap-1"><CalendarCheck className="size-3" /> Date</span>
+                  <span className="flex items-center gap-1 text-muted-foreground"><CalendarCheck className="size-3" /> Date</span>
                   <span className="text-foreground">{formattedDate}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground flex items-center gap-1"><Clock className="size-3" /> Time</span>
+                  <span className="flex items-center gap-1 text-muted-foreground"><Clock className="size-3" /> Time</span>
                   <span className="text-foreground">{reservation.time}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground flex items-center gap-1"><Users className="size-3" /> Guests</span>
+                  <span className="flex items-center gap-1 text-muted-foreground"><Users className="size-3" /> Guests</span>
                   <span className="text-foreground">{reservation.guestCount}</span>
                 </div>
-                <div className="border-t border-border/40 pt-2 flex justify-between">
+                <div className="flex justify-between border-t border-border/40 pt-2">
                   <span className="font-semibold text-foreground">Booking Fee</span>
                   <span className="font-bold text-brand-orange">{formatPrice(BOOKING_FEE)}</span>
                 </div>
@@ -183,29 +181,28 @@ export function PaymentCheckout({ reservation, userPhone, userEmail }: Props) {
             </CardContent>
           </Card>
 
-          {/* Payment method */}
           <Card className="border-border/50 shadow-sm">
             <CardContent className="pt-5">
-              <h3 className="text-sm font-semibold text-foreground mb-3">Payment Method</h3>
+              <h3 className="mb-3 text-sm font-semibold text-foreground">Payment Method</h3>
               <div className="space-y-2">
-                {methods.map((m) => (
+                {methods.map((method) => (
                   <button
-                    key={m.id}
+                    key={method.id}
                     type="button"
-                    onClick={() => setPaymentMethod(m.id)}
-                    className={`flex items-center gap-3 w-full px-3 py-3 rounded-lg border transition-colors ${
-                      paymentMethod === m.id
+                    onClick={() => setPaymentMethod(method.id)}
+                    className={`flex w-full items-center gap-3 rounded-lg border px-3 py-3 transition-colors ${
+                      paymentMethod === method.id
                         ? "border-brand-orange bg-brand-orange/5"
                         : "border-border/60 hover:border-brand-orange/30"
                     }`}
                   >
-                    <div className={`size-5 rounded-full border-2 flex items-center justify-center ${
-                      paymentMethod === m.id ? "border-brand-orange" : "border-border"
+                    <div className={`flex size-5 items-center justify-center rounded-full border-2 ${
+                      paymentMethod === method.id ? "border-brand-orange" : "border-border"
                     }`}>
-                      {paymentMethod === m.id && <div className="size-2.5 rounded-full bg-brand-orange" />}
+                      {paymentMethod === method.id && <div className="size-2.5 rounded-full bg-brand-orange" />}
                     </div>
-                    <m.icon className={`size-4 ${m.color}`} />
-                    <span className="text-sm font-medium text-foreground">{m.label}</span>
+                    <method.icon className={`size-4 ${method.color}`} />
+                    <span className="text-sm font-medium text-foreground">{method.label}</span>
                   </button>
                 ))}
               </div>
@@ -214,11 +211,11 @@ export function PaymentCheckout({ reservation, userPhone, userEmail }: Props) {
                 <div className="mt-4 space-y-2">
                   <Label className="text-xs">Phone Number</Label>
                   <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                    <Phone className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       type="tel"
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      onChange={(event) => setPhone(event.target.value)}
                       className="pl-9"
                       placeholder="+237 6XX XXX XXX"
                     />
@@ -228,12 +225,11 @@ export function PaymentCheckout({ reservation, userPhone, userEmail }: Props) {
             </CardContent>
           </Card>
 
-          {/* Actions */}
           <div className="flex flex-col gap-3">
             <button
               onClick={handlePay}
               disabled={processing}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors disabled:opacity-50 shadow-md shadow-emerald-600/20"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-sm font-semibold text-white shadow-md shadow-emerald-600/20 transition-colors hover:bg-emerald-700 disabled:opacity-50"
             >
               {processing ? (
                 <>
@@ -249,13 +245,13 @@ export function PaymentCheckout({ reservation, userPhone, userEmail }: Props) {
             </button>
             <Link
               href="/dashboard/reservations"
-              className="w-full flex items-center justify-center px-4 py-2.5 rounded-xl text-sm font-medium border border-border/60 text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+              className="flex w-full items-center justify-center rounded-xl border border-border/60 px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
             >
               Cancel
             </Link>
           </div>
 
-          <p className="text-[10px] text-center text-muted-foreground flex items-center justify-center gap-1">
+          <p className="flex items-center justify-center gap-1 text-center text-[10px] text-muted-foreground">
             <Lock className="size-2.5" />
             {IS_PAYMENT_SIMULATED ? "Simulated — no real charges" : "Secured by " + paymentMethod}
           </p>
