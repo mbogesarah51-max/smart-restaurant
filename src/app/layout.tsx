@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { UserProvider } from "@/context/user-context";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
+import "./dark-mode.css";
 import "./reservation-fee.css";
 
 const inter = Inter({
