@@ -14,6 +14,7 @@ import {
   UtensilsCrossed,
   Users,
   ShieldCheck,
+  BarChart3,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -49,6 +50,7 @@ const adminNav: NavItem[] = [
   { label: "Restaurants", href: "/dashboard/admin/restaurants", icon: UtensilsCrossed },
   { label: "Users", href: "/dashboard/admin/users", icon: Users },
   { label: "Reservations", href: "/dashboard/admin/reservations", icon: CalendarCheck },
+  { label: "Analytics", href: "/dashboard/admin/analytics", icon: BarChart3 },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 

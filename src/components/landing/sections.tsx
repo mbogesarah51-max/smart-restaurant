@@ -345,17 +345,16 @@ export function SocialProofSection() {
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <StaggerContainer className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           {stats.map((stat) => (
-            <StaggerItem
-              key={stat.label}
-              className="group text-center rounded-3xl border border-black/[0.05] bg-white/70 backdrop-blur-sm px-4 py-7 shadow-[0_1px_3px_rgba(26,20,17,0.04),0_10px_30px_-14px_rgba(26,20,17,0.1)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_36px_-12px_rgba(249,115,22,0.2)]"
-            >
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 ring-1 ring-brand-orange/10 mb-4 group-hover:scale-110 transition-transform duration-300">
-                <stat.icon className="w-5 h-5 text-brand-orange" />
+            <StaggerItem key={stat.label} className="h-full">
+              <div className="group h-full text-center rounded-3xl border border-black/[0.05] bg-white/70 backdrop-blur-sm px-4 py-7 shadow-[0_1px_3px_rgba(26,20,17,0.04),0_10px_30px_-14px_rgba(26,20,17,0.1)] transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_12px_36px_-12px_rgba(249,115,22,0.2)]">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 ring-1 ring-brand-orange/10 mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <stat.icon className="w-5 h-5 text-brand-orange" />
+                </div>
+                <div className="text-3xl sm:text-4xl font-bold text-brand-dark font-heading">
+                  <AnimatedCounter target={stat.target} suffix={stat.suffix} />
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
               </div>
-              <div className="text-3xl sm:text-4xl font-bold text-brand-dark font-heading">
-                <AnimatedCounter target={stat.target} suffix={stat.suffix} />
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
             </StaggerItem>
           ))}
         </StaggerContainer>

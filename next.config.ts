@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
         hostname: "res.cloudinary.com",
       },
       {
+        // Seed/demo restaurant imagery is served from Unsplash.
         protocol: "https",
         hostname: "images.unsplash.com",
       },

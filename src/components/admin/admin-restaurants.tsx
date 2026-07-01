@@ -1,25 +1,21 @@
 "use client";
 
-import { useState, useEffect, useTransition, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
 import { toast } from "sonner";
 import {
-  Search,
-  Store,
-  ArrowRight,
   Loader2,
+  Store,
   Check,
   X,
   Ban,
   RotateCcw,
+  Trash2,
   UtensilsCrossed,
+  BookOpen,
+  CalendarCheck,
+  ExternalLink,
 } from "lucide-react";
 import {
   getAdminRestaurants,
@@ -27,16 +23,29 @@ import {
   rejectRestaurant,
   suspendRestaurant,
   activateRestaurant,
+  deleteRestaurant,
 } from "@/app/actions/admin";
+import {
+  AdminPageHeader,
+  FilterTabs,
+  SearchBox,
+  SectionCard,
+  EmptyState,
+  ConfirmDialog,
+} from "@/components/admin/admin-kit";
 
 type Tab = "pending" | "approved" | "suspended" | "all";
 
 const TABS: { value: Tab; label: string }[] = [
-  { value: "pending", label: "Pending Approval" },
+  { value: "pending", label: "Pending" },
   { value: "approved", label: "Approved" },
   { value: "suspended", label: "Suspended" },
   { value: "all", label: "All" },
 ];
+
+const PRICE_ICONS: Record<string, string> = {
+  BUDGET: "$", MODERATE: "$$", PREMIUM: "$$$", LUXURY: "$$$$",
+};
 
 type RestaurantRow = {
   id: string;
@@ -50,144 +59,174 @@ type RestaurantRow = {
   _count: { menuItems: number; reservations: number };
 };
 
-const PRICE_ICONS: Record<string, string> = {
-  BUDGET: "$", MODERATE: "$$", PREMIUM: "$$$", LUXURY: "$$$$",
-};
-
 export function AdminRestaurantsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
 
-  const initialTab = (searchParams.get("status") as Tab) || "pending";
-  const [tab, setTab] = useState<Tab>(initialTab);
+  const [tab, setTab] = useState<Tab>((searchParams.get("status") as Tab) || "pending");
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [restaurants, setRestaurants] = useState<RestaurantRow[]>([]);
   const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<RestaurantRow | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    const result = await getAdminRestaurants({ status: tab, search: search.trim() || undefined });
-    if (result) {
-      setRestaurants(result.restaurants as unknown as RestaurantRow[]);
-      setTotal(result.total);
-    }
-    // Also get pending count for badge
-    const pendingResult = await getAdminRestaurants({ status: "pending", limit: 1 });
-    if (pendingResult) setPendingCount(pendingResult.total);
-    setLoading(false);
-  }, [tab, search]);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(t);
+  }, [search]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([
+      getAdminRestaurants({ status: tab, search: debouncedSearch.trim() || undefined }),
+      getAdminRestaurants({ status: "pending", limit: 1 }),
+    ]).then(([res, pending]) => {
+      if (cancelled) return;
+      if (res) {
+        setRestaurants(res.restaurants as unknown as RestaurantRow[]);
+        setTotal(res.total);
+      }
+      if (pending) setPendingCount(pending.total);
+      setLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [tab, debouncedSearch, refreshKey]);
+
+  const refetch = () => setRefreshKey((k) => k + 1);
 
   function switchTab(t: Tab) {
     setTab(t);
     router.replace(`/dashboard/admin/restaurants?status=${t}`, { scroll: false });
   }
 
-  function getStatusBadge(r: RestaurantRow) {
-    if (!r.isActive) return <Badge variant="destructive" className="text-[10px]">Suspended</Badge>;
-    if (r.isApproved) return <Badge variant="secondary" className="text-[10px] bg-emerald-100 text-emerald-700 border-0">Approved</Badge>;
-    return <Badge variant="secondary" className="text-[10px] bg-amber-100 text-amber-700 border-0">Pending</Badge>;
+  async function act(id: string, action: () => Promise<{ success: boolean; message: string }>) {
+    setBusyId(id);
+    const result = await action();
+    if (result.success) toast.success(result.message);
+    else toast.error(result.message);
+    setBusyId(null);
+    refetch();
   }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    const result = await deleteRestaurant(deleteTarget.id);
+    setDeleting(false);
+    if (result.success) toast.success(result.message);
+    else toast.error(result.message);
+    setDeleteTarget(null);
+    refetch();
+  }
+
+  function statusPill(r: RestaurantRow) {
+    if (!r.isActive) return <span className="inline-flex items-center rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-semibold text-rose-600">Suspended</span>;
+    if (r.isApproved) return <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">Approved</span>;
+    return <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">Pending</span>;
+  }
+
+  const tabsWithCount = TABS.map((t) => (t.value === "pending" ? { ...t, count: pendingCount } : t));
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-bold font-heading text-foreground">Restaurants</h1>
-        <p className="text-sm text-muted-foreground">Manage restaurant listings and approvals</p>
+      <AdminPageHeader title="Restaurants" subtitle="Approve, moderate and manage every listing." icon={UtensilsCrossed} />
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <FilterTabs tabs={tabsWithCount} value={tab} onChange={switchTab} />
+        <SearchBox value={search} onChange={setSearch} placeholder="Search name or city…" />
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 overflow-x-auto pb-1">
-        {TABS.map((t) => (
-          <button
-            key={t.value}
-            onClick={() => switchTab(t.value)}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-              tab === t.value
-                ? "bg-brand-orange text-white"
-                : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-            }`}
-          >
-            {t.label}
-            {t.value === "pending" && pendingCount > 0 && (
-              <span className={`text-[10px] px-1.5 py-px rounded-full ${tab === "pending" ? "bg-white/20" : "bg-amber-100 text-amber-700"}`}>
-                {pendingCount}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Search */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by name or city..."
-          className="pl-9 h-9 rounded-lg"
-        />
-      </div>
-
-      {/* Table */}
-      {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="size-6 animate-spin text-muted-foreground" />
-        </div>
-      ) : restaurants.length === 0 ? (
-        <Card className="border-border/50 shadow-sm">
-          <CardContent className="py-16">
-            <div className="flex flex-col items-center text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/50 mb-3">
-                <UtensilsCrossed className="size-6 text-muted-foreground/50" />
-              </div>
-              <p className="text-sm text-muted-foreground">No restaurants found</p>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="rounded-lg border border-border/50 overflow-hidden bg-white">
+      <SectionCard bodyClassName="p-0">
+        {loading && restaurants.length === 0 ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="size-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : restaurants.length === 0 ? (
+          <EmptyState icon={Store} title="No restaurants found" hint="Try a different filter or search." />
+        ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border/40 bg-muted/30">
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">Restaurant</th>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden sm:table-cell">Owner</th>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden md:table-cell">City</th>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden md:table-cell">Price</th>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">Status</th>
-                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">Actions</th>
+                <tr className="border-b border-black/[0.06] bg-brand-sand/40 text-left text-[11px] uppercase tracking-wide text-muted-foreground">
+                  <th className="px-4 py-3 font-semibold">Restaurant</th>
+                  <th className="hidden px-4 py-3 font-semibold sm:table-cell">Owner</th>
+                  <th className="hidden px-4 py-3 font-semibold md:table-cell">City</th>
+                  <th className="hidden px-4 py-3 font-semibold lg:table-cell">Menu / Bookings</th>
+                  <th className="px-4 py-3 font-semibold">Status</th>
+                  <th className="px-4 py-3 text-right font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {restaurants.map((r) => (
-                  <tr key={r.id} className="border-b border-border/30 last:border-0 hover:bg-muted/20 transition-colors">
+                  <tr key={r.id} className="border-b border-black/[0.04] transition-colors last:border-0 hover:bg-brand-orange/[0.03]">
                     <td className="px-4 py-3">
-                      <div>
-                        <p className="font-medium text-foreground">{r.name}</p>
-                        <p className="text-xs text-muted-foreground sm:hidden">{r.owner.name}</p>
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-100 to-amber-100 text-brand-orange">
+                          <Store className="size-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate font-medium text-brand-dark">{r.name}</p>
+                          <p className="text-xs text-muted-foreground sm:hidden">{r.owner.name} · {r.city}</p>
+                          <p className="hidden text-xs text-muted-foreground sm:block">{PRICE_ICONS[r.priceRange]}</p>
+                        </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 hidden sm:table-cell">
-                      <p className="text-foreground">{r.owner.name}</p>
-                      <p className="text-xs text-muted-foreground">{r.owner.email}</p>
+                    <td className="hidden px-4 py-3 sm:table-cell">
+                      <p className="text-brand-dark">{r.owner.name}</p>
+                      <p className="truncate text-xs text-muted-foreground">{r.owner.email}</p>
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">{r.city}</td>
-                    <td className="px-4 py-3 text-muted-foreground hidden md:table-cell font-medium">{PRICE_ICONS[r.priceRange]}</td>
-                    <td className="px-4 py-3">{getStatusBadge(r)}</td>
+                    <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">{r.city}</td>
+                    <td className="hidden px-4 py-3 lg:table-cell">
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <span className="inline-flex items-center gap-1"><BookOpen className="size-3" /> {r._count.menuItems}</span>
+                        <span className="inline-flex items-center gap-1"><CalendarCheck className="size-3" /> {r._count.reservations}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">{statusPill(r)}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
                         <Link
                           href={`/dashboard/admin/restaurants/${r.id}`}
-                          className="px-2.5 py-1 rounded-md text-xs font-medium text-brand-orange hover:bg-brand-orange/10 transition-colors"
+                          className="mr-1 inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-brand-orange transition-colors hover:bg-brand-orange/10"
                         >
-                          Review
+                          Review <ExternalLink className="size-3" />
                         </Link>
-                        <QuickActions restaurant={r} onDone={fetchData} />
+                        {busyId === r.id ? (
+                          <Loader2 className="mx-2 size-4 animate-spin text-muted-foreground" />
+                        ) : (
+                          <>
+                            {!r.isApproved && r.isActive && (
+                              <>
+                                <button onClick={() => act(r.id, () => approveRestaurant(r.id))} title="Approve" className="cursor-pointer rounded-lg p-1.5 text-emerald-600 transition-colors hover:bg-emerald-50">
+                                  <Check className="size-4" />
+                                </button>
+                                <button onClick={() => act(r.id, () => rejectRestaurant(r.id))} title="Reject" className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-rose-50 hover:text-rose-600">
+                                  <X className="size-4" />
+                                </button>
+                              </>
+                            )}
+                            {r.isApproved && r.isActive && (
+                              <button onClick={() => act(r.id, () => suspendRestaurant(r.id))} title="Suspend" className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-amber-50 hover:text-amber-600">
+                                <Ban className="size-4" />
+                              </button>
+                            )}
+                            {!r.isActive && (
+                              <button onClick={() => act(r.id, () => activateRestaurant(r.id))} title="Reactivate" className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-emerald-50 hover:text-emerald-600">
+                                <RotateCcw className="size-4" />
+                              </button>
+                            )}
+                            <button onClick={() => setDeleteTarget(r)} title="Delete" className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive">
+                              <Trash2 className="size-4" />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -195,53 +234,27 @@ export function AdminRestaurantsPage() {
               </tbody>
             </table>
           </div>
-        </div>
-      )}
+        )}
+      </SectionCard>
 
-      <p className="text-xs text-muted-foreground text-center">{total} restaurant{total !== 1 ? "s" : ""} total</p>
+      <p className="text-center text-xs text-muted-foreground tabular-nums">
+        {total} restaurant{total !== 1 ? "s" : ""} total
+      </p>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(v) => !v && setDeleteTarget(null)}
+        title="Delete restaurant?"
+        description={
+          <>
+            This permanently deletes <span className="font-semibold text-foreground">{deleteTarget?.name}</span>, along with its
+            {deleteTarget ? ` ${deleteTarget._count.menuItems} menu item${deleteTarget._count.menuItems !== 1 ? "s" : ""} and ${deleteTarget._count.reservations} reservation${deleteTarget._count.reservations !== 1 ? "s" : ""}` : ""}. This cannot be undone.
+          </>
+        }
+        confirmLabel="Delete restaurant"
+        loading={deleting}
+        onConfirm={confirmDelete}
+      />
     </div>
-  );
-}
-
-function QuickActions({ restaurant: r, onDone }: { restaurant: RestaurantRow; onDone: () => void }) {
-  const [acting, setActing] = useState(false);
-
-  async function act(action: () => Promise<{ success: boolean; message: string }>) {
-    setActing(true);
-    const result = await action();
-    if (result.success) toast.success(result.message);
-    else toast.error(result.message);
-    setActing(false);
-    onDone();
-  }
-
-  if (acting) return <Loader2 className="size-4 animate-spin text-muted-foreground mx-2" />;
-
-  return (
-    <>
-      {/* Pending → Approve / Reject */}
-      {!r.isApproved && r.isActive && (
-        <>
-          <button onClick={() => act(() => approveRestaurant(r.id))} className="p-1.5 rounded-md text-emerald-600 hover:bg-emerald-50 transition-colors" title="Approve">
-            <Check className="size-3.5" />
-          </button>
-          <button onClick={() => act(() => rejectRestaurant(r.id))} className="p-1.5 rounded-md text-destructive hover:bg-destructive/10 transition-colors" title="Reject">
-            <X className="size-3.5" />
-          </button>
-        </>
-      )}
-      {/* Approved → Suspend */}
-      {r.isApproved && r.isActive && (
-        <button onClick={() => act(() => suspendRestaurant(r.id))} className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" title="Suspend">
-          <Ban className="size-3.5" />
-        </button>
-      )}
-      {/* Suspended → Reactivate */}
-      {!r.isActive && (
-        <button onClick={() => act(() => activateRestaurant(r.id))} className="p-1.5 rounded-md text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 transition-colors" title="Reactivate">
-          <RotateCcw className="size-3.5" />
-        </button>
-      )}
-    </>
   );
 }

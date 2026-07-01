@@ -26,6 +26,27 @@ function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+/**
+ * ScrollTrigger computes each trigger's scroll position at creation time. In
+ * this app the hero is `min-h-[100dvh]` with fonts + images that load after
+ * hydration, so the first measurement is stale — triggers below the fold can
+ * fail to fire until a reload reads a warm layout. We recompute positions once
+ * fonts/images settle so reveals fire reliably on the FIRST load. Idempotent.
+ */
+let scrollHealthInit = false;
+function ensureScrollHealth() {
+  if (scrollHealthInit || typeof window === "undefined") return;
+  scrollHealthInit = true;
+  const refresh = () => ScrollTrigger.refresh();
+  window.addEventListener("load", refresh);
+  if (typeof document !== "undefined" && "fonts" in document) {
+    document.fonts.ready.then(refresh).catch(() => {});
+  }
+  // After hydration + layout has settled (covers the case where `load`
+  // already fired before React mounted these components).
+  setTimeout(refresh, 400);
+}
+
 type Direction = "up" | "down" | "left" | "right" | "none";
 
 const OFFSET: Record<Direction, { x: number; y: number }> = {
@@ -58,6 +79,7 @@ export function Reveal({
     () => {
       const el = ref.current;
       if (!el || prefersReducedMotion()) return; // visible by default
+      ensureScrollHealth();
       const { x, y } = OFFSET[direction];
       gsap.from(el, {
         opacity: 0,
@@ -66,9 +88,11 @@ export function Reveal({
         duration,
         delay,
         ease: "power3.out",
+        clearProps: "opacity,transform",
+        overwrite: "auto",
         scrollTrigger: {
           trigger: el,
-          start: "top 88%",
+          start: "top 90%",
           toggleActions: once ? "play none none none" : "play none none reverse",
         },
       });
@@ -103,15 +127,18 @@ export function Stagger({
       if (!el) return;
       const items = el.querySelectorAll<HTMLElement>("[data-stagger-item]");
       if (!items.length || prefersReducedMotion()) return; // visible by default
+      ensureScrollHealth();
       gsap.from(items, {
         opacity: 0,
         y: 28,
         duration: 0.7,
         ease: "power3.out",
         stagger: step,
+        clearProps: "opacity,transform",
+        overwrite: "auto",
         scrollTrigger: {
           trigger: el,
-          start: "top 85%",
+          start: "top 90%",
           toggleActions: once ? "play none none none" : "play none none reverse",
         },
       });
@@ -170,6 +197,7 @@ export function Counter({
         render(target);
         return;
       }
+      ensureScrollHealth();
       const counter = { value: 0 };
       render(0);
       gsap.to(counter, {
@@ -177,7 +205,7 @@ export function Counter({
         duration: duration / 1000,
         ease: "power2.out",
         onUpdate: () => render(counter.value),
-        scrollTrigger: { trigger: el, start: "top 90%", once: true },
+        scrollTrigger: { trigger: el, start: "top 95%", once: true },
       });
     },
     { scope: ref, dependencies: [target, prefix, suffix, duration] }

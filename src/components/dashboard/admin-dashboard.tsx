@@ -1,23 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Users,
   UtensilsCrossed,
   CalendarCheck,
+  Wallet,
   Clock,
   Store,
   ArrowRight,
+  ArrowUpRight,
+  LayoutDashboard,
   UserPlus,
+  BarChart3,
 } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  AdminPageHeader,
+  KpiCard,
+  SectionCard,
+  EmptyState,
+} from "@/components/admin/admin-kit";
 import type { SafeUser } from "@/types";
 
 type AdminStats = {
@@ -29,6 +33,9 @@ type AdminStats = {
   approvedRestaurants: number;
   pendingRestaurants: number;
   totalReservations: number;
+  confirmedReservations: number;
+  totalRevenue: number;
+  trend: number[];
   recentUsers: { id: string; name: string; email: string; role: string; createdAt: Date }[];
   pendingRestaurantsList: { id: string; name: string; city: string; createdAt: Date; owner: { name: string; email: string } }[];
 };
@@ -36,177 +43,224 @@ type AdminStats = {
 const ROLE_COLORS: Record<string, string> = {
   CLIENT: "bg-blue-100 text-blue-700",
   RESTAURANT_OWNER: "bg-emerald-100 text-emerald-700",
-  ADMIN: "bg-purple-100 text-purple-700",
+  ADMIN: "bg-violet-100 text-violet-700",
 };
-
 const ROLE_LABELS: Record<string, string> = {
   CLIENT: "Diner",
   RESTAURANT_OWNER: "Owner",
   ADMIN: "Admin",
 };
 
-export function AdminDashboard({ user, stats }: { user: SafeUser; stats: AdminStats }) {
+export function AdminDashboard({ stats }: { user: SafeUser; stats: AdminStats }) {
+  const trendData = stats.trend.map((count, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (stats.trend.length - 1 - i));
+    return { label: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }), value: count };
+  });
+  const max = Math.max(...trendData.map((d) => d.value), 1);
+  const confirmRate = stats.totalReservations
+    ? Math.round((stats.confirmedReservations / stats.totalReservations) * 100)
+    : 0;
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold font-heading text-foreground">Platform Overview</h1>
-        <p className="text-muted-foreground mt-1">Monitor and manage ChopWise.</p>
-      </div>
+      <AdminPageHeader
+        title="Platform Overview"
+        subtitle="Monitor and manage everything happening on ChopWise."
+        icon={LayoutDashboard}
+        actions={
+          <Link href="/dashboard/admin/analytics">
+            <Button variant="outline" size="lg" className="rounded-xl">
+              <BarChart3 className="size-4" /> Analytics
+            </Button>
+          </Link>
+        }
+      />
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
+      {/* KPIs */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <KpiCard
           label="Total Users"
           value={stats.totalUsers}
-          sub={`${stats.clientCount} diners · ${stats.ownerCount} owners · ${stats.adminCount} admins`}
           icon={Users}
-          iconBg="bg-blue-50"
-          iconColor="text-blue-600"
+          accent="blue"
+          sub={`${stats.clientCount} diners · ${stats.ownerCount} owners · ${stats.adminCount} admins`}
+          href="/dashboard/admin/users"
         />
-        <StatCard
+        <KpiCard
           label="Restaurants"
           value={stats.totalRestaurants}
-          sub={`${stats.approvedRestaurants} approved · ${stats.pendingRestaurants} pending`}
           icon={UtensilsCrossed}
-          iconBg="bg-emerald-50"
-          iconColor="text-emerald-600"
+          accent="emerald"
+          sub={`${stats.approvedRestaurants} approved · ${stats.pendingRestaurants} pending`}
+          href="/dashboard/admin/restaurants"
         />
-        <StatCard
+        <KpiCard
           label="Reservations"
           value={stats.totalReservations}
-          sub="All time"
           icon={CalendarCheck}
-          iconBg="bg-brand-orange/10"
-          iconColor="text-brand-orange"
+          accent="orange"
+          sub={`${confirmRate}% confirmed`}
+          spark={stats.trend}
+          href="/dashboard/admin/reservations"
         />
-        <Link href="/dashboard/admin/restaurants?status=pending" className="block">
-          <Card className={`border-border/50 shadow-sm h-full transition-colors ${stats.pendingRestaurants > 0 ? "border-amber-300 bg-amber-50/30 hover:border-amber-400" : "hover:border-brand-orange/20"}`}>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Pending Approvals</p>
-                  <p className={`text-2xl font-bold mt-1 ${stats.pendingRestaurants > 0 ? "text-amber-600" : "text-foreground"}`}>
-                    {stats.pendingRestaurants}
-                  </p>
-                  <p className="text-xs text-brand-orange font-medium flex items-center gap-1 mt-1">
-                    Review now <ArrowRight className="size-3" />
-                  </p>
-                </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100">
-                  <Clock className="size-6 text-amber-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
+        <KpiCard
+          label="Revenue"
+          value={formatPrice(stats.totalRevenue)}
+          icon={Wallet}
+          accent="violet"
+          sub="Confirmed booking fees"
+          href="/dashboard/admin/analytics"
+        />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Pending Restaurants */}
-        <Card className="border-border/50 shadow-sm">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-base font-heading">Pending Restaurants</CardTitle>
-                <CardDescription>Awaiting your review</CardDescription>
-              </div>
-              {stats.pendingRestaurants > 0 && (
-                <Link href="/dashboard/admin/restaurants?status=pending" className="text-xs font-medium text-brand-orange hover:underline">
-                  View all
-                </Link>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
-            {stats.pendingRestaurantsList.length === 0 ? (
-              <div className="flex flex-col items-center py-8 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/50 mb-3">
-                  <Store className="size-5 text-muted-foreground/50" />
+      {/* Activity + pending */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <SectionCard
+          className="lg:col-span-2"
+          title="Booking activity"
+          description="Requests received over the last 14 days"
+          action={
+            <Link href="/dashboard/admin/analytics" className="text-xs font-medium text-brand-orange hover:underline">
+              Full analytics
+            </Link>
+          }
+        >
+          {max <= 1 && stats.trend.every((v) => v === 0) ? (
+            <EmptyState icon={CalendarCheck} title="No recent bookings" hint="New reservations will show up here." />
+          ) : (
+            <div className="flex items-end gap-[5px] h-48">
+              {trendData.map((d, i) => (
+                <div key={i} className="group/bar relative flex h-full flex-1 items-end">
+                  <div
+                    className="w-full rounded-t-md bg-gradient-to-t from-orange-400 to-amber-500 transition-[filter] duration-200 group-hover/bar:brightness-110"
+                    style={{ height: `${d.value > 0 ? Math.max((d.value / max) * 100, 4) : 0}%` }}
+                  />
+                  <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1.5 hidden -translate-x-1/2 whitespace-nowrap rounded-lg bg-brand-dark px-2 py-1 text-[10px] font-medium text-white shadow-lg group-hover/bar:block">
+                    {d.label} · <span className="tabular-nums">{d.value}</span>
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground">No pending approvals</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {stats.pendingRestaurantsList.map((r) => (
-                  <Link
-                    key={r.id}
-                    href={`/dashboard/admin/restaurants/${r.id}`}
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
-                  >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 shrink-0">
-                      <Store className="size-4 text-amber-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate group-hover:text-brand-orange">{r.name}</p>
-                      <p className="text-xs text-muted-foreground">{r.city} · by {r.owner.name}</p>
-                    </div>
-                    <ArrowRight className="size-4 text-muted-foreground group-hover:text-brand-orange group-hover:translate-x-0.5 transition-all" />
-                  </Link>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              ))}
+            </div>
+          )}
+          <div className="mt-2 flex justify-between text-[10px] text-muted-foreground">
+            <span>{trendData[0]?.label}</span>
+            <span>{trendData[Math.floor(trendData.length / 2)]?.label}</span>
+            <span>Today</span>
+          </div>
+        </SectionCard>
 
-        {/* Recent Users */}
-        <Card className="border-border/50 shadow-sm">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-base font-heading">Recent Registrations</CardTitle>
-                <CardDescription>Latest users</CardDescription>
-              </div>
-              <Link href="/dashboard/admin/users" className="text-xs font-medium text-brand-orange hover:underline">
+        <div className="space-y-4">
+          <KpiCard
+            label="Pending approvals"
+            value={stats.pendingRestaurants}
+            icon={Clock}
+            accent="amber"
+            sub={stats.pendingRestaurants > 0 ? "Needs your review" : "All caught up"}
+            href="/dashboard/admin/restaurants?status=pending"
+            highlight={stats.pendingRestaurants > 0}
+          />
+          <KpiCard
+            label="Confirmed bookings"
+            value={stats.confirmedReservations}
+            icon={CalendarCheck}
+            accent="emerald"
+            sub={`${confirmRate}% of all reservations`}
+            href="/dashboard/admin/reservations?status=CONFIRMED"
+          />
+        </div>
+      </div>
+
+      {/* Pending restaurants + recent users */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <SectionCard
+          title="Pending restaurants"
+          description="Awaiting your review"
+          bodyClassName="p-3"
+          action={
+            stats.pendingRestaurants > 0 ? (
+              <Link href="/dashboard/admin/restaurants?status=pending" className="text-xs font-medium text-brand-orange hover:underline">
                 View all
               </Link>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {stats.recentUsers.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">No users yet</p>
-            ) : (
-              <div className="space-y-2">
-                {stats.recentUsers.map((u) => (
-                  <div key={u.id} className="flex items-center gap-3 p-2 rounded-lg">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted/50 shrink-0">
-                      <UserPlus className="size-3.5 text-muted-foreground" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{u.name}</p>
-                      <p className="text-[11px] text-muted-foreground truncate">{u.email}</p>
-                    </div>
-                    <Badge variant="secondary" className={`border-0 text-[10px] shrink-0 ${ROLE_COLORS[u.role]}`}>
-                      {ROLE_LABELS[u.role] || u.role}
-                    </Badge>
+            ) : undefined
+          }
+        >
+          {stats.pendingRestaurantsList.length === 0 ? (
+            <EmptyState icon={Store} title="No pending approvals" hint="New restaurant submissions land here." />
+          ) : (
+            <div className="space-y-1">
+              {stats.pendingRestaurantsList.map((r) => (
+                <Link
+                  key={r.id}
+                  href={`/dashboard/admin/restaurants/${r.id}`}
+                  className="group flex items-center gap-3 rounded-xl p-2.5 transition-colors hover:bg-amber-50/70"
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-100 to-orange-100 text-amber-600">
+                    <Store className="size-4" />
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-brand-dark group-hover:text-brand-orange">{r.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">{r.city} · by {r.owner.name}</p>
+                  </div>
+                  <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-brand-orange" />
+                </Link>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+
+        <SectionCard
+          title="Recent registrations"
+          description="Newest members"
+          bodyClassName="p-3"
+          action={
+            <Link href="/dashboard/admin/users" className="text-xs font-medium text-brand-orange hover:underline">
+              View all
+            </Link>
+          }
+        >
+          {stats.recentUsers.length === 0 ? (
+            <EmptyState icon={UserPlus} title="No users yet" />
+          ) : (
+            <div className="space-y-0.5">
+              {stats.recentUsers.map((u) => (
+                <div key={u.id} className="flex items-center gap-3 rounded-xl p-2.5 transition-colors hover:bg-muted/50">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-orange/90 to-amber-500 text-[11px] font-bold text-white">
+                    {u.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-brand-dark">{u.name}</p>
+                    <p className="truncate text-[11px] text-muted-foreground">{u.email}</p>
+                  </div>
+                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${ROLE_COLORS[u.role]}`}>
+                    {ROLE_LABELS[u.role] || u.role}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+      </div>
+
+      {/* Quick links */}
+      <div className="flex flex-wrap gap-2">
+        {[
+          { href: "/dashboard/admin/restaurants", label: "Manage restaurants", icon: UtensilsCrossed },
+          { href: "/dashboard/admin/users", label: "Manage users", icon: Users },
+          { href: "/dashboard/admin/reservations", label: "All reservations", icon: CalendarCheck },
+          { href: "/dashboard/admin/analytics", label: "Analytics", icon: BarChart3 },
+        ].map((l) => (
+          <Link
+            key={l.href}
+            href={l.href}
+            className="group inline-flex items-center gap-2 rounded-xl border border-black/[0.06] bg-white/70 px-3.5 py-2 text-[13px] font-medium text-brand-dark transition-all hover:border-brand-orange/30 hover:bg-brand-orange/5"
+          >
+            <l.icon className="size-4 text-brand-orange" />
+            {l.label}
+            <ArrowUpRight className="size-3.5 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </Link>
+        ))}
       </div>
     </div>
-  );
-}
-
-function StatCard({ label, value, sub, icon: Icon, iconBg, iconColor }: {
-  label: string; value: number; sub: string;
-  icon: typeof Users; iconBg: string; iconColor: string;
-}) {
-  return (
-    <Card className="border-border/50 shadow-sm">
-      <CardContent className="pt-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-muted-foreground">{label}</p>
-            <p className="text-2xl font-bold text-foreground mt-1">{value}</p>
-            <p className="text-[11px] text-muted-foreground mt-1">{sub}</p>
-          </div>
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${iconBg}`}>
-            <Icon className={`size-6 ${iconColor}`} />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
