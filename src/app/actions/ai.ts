@@ -1,6 +1,5 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
 import OpenAI from "openai";
 import prisma from "@/lib/prisma";
@@ -121,19 +120,8 @@ export async function getAIRecommendations(
 async function runRecommendation(
   userMessage: string
 ): Promise<ActionResponse<AIRecommendationResponse>> {
-  let userId: string | null;
-  try {
-    const session = await auth();
-    userId = session.userId;
-  } catch (authError) {
-    console.error("[AI Recommend] auth() failed:", authError);
-    return { success: false, message: "Authentication check failed. Please try again." };
-  }
-
-  if (!userId) {
-    return { success: false, message: "You need to be signed in to get recommendations." };
-  }
-
+  // Public demo: no sign-in required, so anyone can try the AI concierge
+  // from the landing page.
   const validated = recommendSchema.safeParse({ userMessage });
   if (!validated.success) {
     return {

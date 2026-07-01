@@ -6,6 +6,12 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/explore(.*)",
   "/restaurants(.*)",
+  // Public marketing pages (must be reachable without signing in)
+  "/ai-concierge(.*)",
+  "/features(.*)",
+  "/how-it-works(.*)",
+  "/for-restaurants(.*)",
+  "/contact(.*)",
   "/api/webhooks(.*)",
   "/api/auth/register",
   "/api/auth/login",

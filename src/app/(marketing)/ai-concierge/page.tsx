@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Bot, ShieldCheck, Sparkles } from "lucide-react";
 import { Navbar } from "@/components/landing/navbar";
 import { PageIntro } from "@/components/landing/page-intro";
-import { AIProductDemo } from "@/components/landing/foodie-discovery";
+import { AIProductDemo } from "@/components/landing/ai-live-demo";
 import { FoodieCTA, FoodieFooter } from "@/components/landing/foodie-footer";
 import { Button } from "@/components/ui/button";
 
@@ -19,8 +19,8 @@ export default function AIConciergePage() {
         eyebrow="AI restaurant concierge"
         title="Ask naturally. Receive restaurant matches that fit the moment."
         description="Tell ChopWise your city, budget, cravings, group size or occasion. The recommendation engine checks approved restaurants and available menu data before presenting ranked matches."
-        image="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1800&q=85"
-        actions={<Link href="/dashboard/ai-recommend"><Button className="h-12 rounded-xl bg-orange-600 px-6 font-bold text-white">Open ChopWise AI <ArrowRight className="ml-2 size-4" /></Button></Link>}
+        image="https://commons.wikimedia.org/wiki/Special:FilePath/Banane_plantains_brais%C3%A9s_accompagn%C3%A9s_de_prunes.jpg?width=1600"
+        actions={<Link href="/ai-concierge/chat"><Button className="h-12 rounded-xl bg-orange-600 px-6 font-bold text-white">Open ChopWise AI <ArrowRight className="ml-2 size-4" /></Button></Link>}
       />
       <AIProductDemo />
       <section className="bg-[#fffaf5] py-16 lg:py-20">

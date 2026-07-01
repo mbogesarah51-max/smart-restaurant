@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/landing/navbar";
 import { FoodieHero } from "@/components/landing/foodie-hero";
-import { AIProductDemo, FeaturedFoodSection, LocalTrustBar } from "@/components/landing/foodie-discovery";
+import { AIProductDemo } from "@/components/landing/ai-live-demo";
+import { FeaturedFoodSection, LocalTrustBar } from "@/components/landing/foodie-discovery";
 import {
   CompactHowItWorks,
   CoreFeatures,

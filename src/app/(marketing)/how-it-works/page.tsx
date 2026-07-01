@@ -19,7 +19,7 @@ export default function HowItWorksPage() {
         eyebrow="How ChopWise works"
         title="A clear journey from restaurant search to confirmed table."
         description="Diners discover restaurants, compare food and prices, submit a reservation and follow the response. Restaurant owners receive, review and manage every request from their dashboard."
-        image="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1800&q=85"
+        image="https://commons.wikimedia.org/wiki/Special:FilePath/Achu_and_Yellow_Soup_with_vegetable.jpg?width=1600"
         actions={<Link href="/explore"><Button className="h-12 rounded-xl bg-orange-600 px-6 font-bold text-white">Start exploring <ArrowRight className="ml-2 size-4" /></Button></Link>}
       />
       <CompactHowItWorks />

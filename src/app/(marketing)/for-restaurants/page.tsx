@@ -19,7 +19,7 @@ export default function ForRestaurantsPage() {
         eyebrow="For restaurant owners"
         title="Put your food, location and availability in front of diners who are ready to book."
         description="ChopWise gives restaurant owners a structured digital profile, menu management, reservation control and WhatsApp-ready communication from one dashboard."
-        image="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=1800&q=85"
+        image="https://commons.wikimedia.org/wiki/Special:FilePath/Grillades_de_poisson.jpg?width=1600"
         actions={<Link href="/sign-up/owner"><Button className="h-12 rounded-xl bg-orange-600 px-6 font-bold text-white">List your restaurant <ArrowRight className="ml-2 size-4" /></Button></Link>}
       />
       <RestaurantOwnerSection />
