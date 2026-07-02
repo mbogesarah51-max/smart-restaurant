@@ -27,8 +27,8 @@ export function FoodieHero() {
   return (
     <section className="relative min-h-[760px] overflow-hidden pt-20 text-white">
       <img
-        src="https://commons.wikimedia.org/wiki/Special:FilePath/Bar_aux_l%C3%A9gumes_et_son_riz_gras.jpg?width=1800"
-        alt="Braised fish with vegetables and riz gras, a Cameroonian dish"
+        src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1800&q=90"
+        alt="A colourful restaurant meal"
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/20" />

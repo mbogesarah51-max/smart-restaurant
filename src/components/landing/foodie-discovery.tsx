@@ -2,10 +2,10 @@ import Link from "next/link";
 import { ArrowRight, Bot, MapPin, MessageCircle, Star, WalletCards } from "lucide-react";
 
 const experiences = [
-  { title: "Brochettes & grilled favourites", city: "Douala", price: "From 5,000 FCFA", rating: "4.8", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Brochettes_de_crevettes.jpg?width=900" },
-  { title: "Achu & yellow soup", city: "Yaoundé", price: "From 4,500 FCFA", rating: "4.7", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Achu_and_Yellow_Soup_with_vegetable.jpg?width=900" },
-  { title: "Fresh grilled fish", city: "Limbe", price: "From 6,500 FCFA", rating: "4.9", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Grillades_de_poisson.jpg?width=900" },
-  { title: "Fufu & Eru", city: "Buea", price: "From 3,000 FCFA", rating: "4.6", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Fufu_and_Eru.jpg?width=900" },
+  { title: "Grills and local favourites", city: "Douala", price: "From 5,000 FCFA", rating: "4.8", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=85" },
+  { title: "Elegant dining experiences", city: "Yaoundé", price: "From 8,000 FCFA", rating: "4.7", image: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=1200&q=85" },
+  { title: "Fresh coastal flavours", city: "Limbe", price: "From 6,500 FCFA", rating: "4.9", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1200&q=85" },
+  { title: "Dessert and coffee spots", city: "Buea", price: "From 3,000 FCFA", rating: "4.6", image: "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=1200&q=85" },
 ];
 
 export function LocalTrustBar() {

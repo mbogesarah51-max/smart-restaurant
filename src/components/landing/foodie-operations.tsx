@@ -98,7 +98,7 @@ export function RestaurantOwnerSection() {
   return (
     <section id="for-restaurants" className="bg-white px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
       <div className="mx-auto grid max-w-7xl overflow-hidden rounded-[2rem] bg-slate-950 lg:grid-cols-2">
-        <div className="relative min-h-[430px]"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Goat_meat_soya.jpg?width=1200" alt="Grilled soya skewers, a Cameroonian street-food classic" className="absolute inset-0 h-full w-full object-cover" /></div>
+        <div className="relative min-h-[430px]"><img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=1200&q=85" alt="Chef preparing a restaurant dish" className="absolute inset-0 h-full w-full object-cover" /></div>
         <div className="p-8 text-white sm:p-12">
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-orange-400">For restaurant owners</p>
           <h2 className="mt-3 font-heading text-4xl font-black">Turn hungry searches into confirmed tables.</h2>

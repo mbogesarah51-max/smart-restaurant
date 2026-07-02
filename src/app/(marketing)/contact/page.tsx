@@ -22,7 +22,7 @@ export default function ContactPage() {
         eyebrow="Contact ChopWise"
         title="Questions, restaurant onboarding or partnership enquiries?"
         description="Use the contact options below to reach the ChopWise project team. The page is linked directly from the main navigation on desktop and mobile."
-        image="https://commons.wikimedia.org/wiki/Special:FilePath/Brochettes_de_crevettes.jpg?width=1600"
+        image="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1800&q=85"
       />
       <section className="py-16 lg:py-20">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.72fr_1.28fr] lg:px-8">
